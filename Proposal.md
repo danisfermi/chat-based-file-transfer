@@ -9,6 +9,9 @@
   * @all messages (including messages to check who has a file) are broadcast to all peers via server and responses unicasted to origin.
   * A peer who has a file can open a socket on a port and add this info to return message, so that the origin peer can connect directly to this port to do a UDP transfer for the file.
   * File transfers are UDP selective repeat based for reliability.
+  * Maybe add more than one server and message hops through each server to get to the destination.
+  * Maybe think of a Content Delivery Network
+  * If there are multiple peers with the same file, get chunks of file from each.
 
 ![alt tag](https://github.com/arjunaugustine/chat-based-file-transfer/blob/master/Screen%20Shot%202016-10-14%20at%201.07.26%20AM.png)
 [](.com)
