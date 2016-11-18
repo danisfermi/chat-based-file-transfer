@@ -60,6 +60,5 @@ Demo setup will be as follows:-
   * Now, we simulate some peers who connect to the server. For this, we open multiple command line instances from multiple machines, each running an instance of the python program named client.py.
   * Once a client is connected to the server, it is joining a chat room and will see a list of all peers connected to the servers. Then it sends out a chat broadcast message requesting a particular file, which is received by the individual peers. The peers who have the file will respond to the requestor. The requester then sends a direct one-to-one request to the peer who has the file, establishes a direct connection and downloads the file. Alternatively, the requester also has the option to chat with a specific peer or peers using the @ipaddress tag name.
 
-![alt tag](https://github.com/arjunaugustine/chat-based-file-transfer/blob/master/Screen%20Shot%202016-10-15%20at%2011.05.59%20AM.png)
 
 
