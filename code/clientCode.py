@@ -11,3 +11,7 @@ print modifiedMessage.decode()
 clientSocket.close()
 """
 
+
+class Client(object):
+  def __init__(self):
+    print "Hello World"

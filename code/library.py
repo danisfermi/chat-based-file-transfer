@@ -2,20 +2,22 @@
 import socket, random, sys
 
 
-class Client (object):
+class ClientNode (object):
   """
   Class object for holding client related information
   """
-  def __init__(self, ip, hostname, username):
+  def __init__(self, ip, hostname, username, port_num):
     """
     Save client info ip, hostname and username.
     :param ip:
     :param hostname:
     :param username:
+    :param port_num
     """
     self.ip = ip
     self.hostname = hostname
     self.username = username
+    self.port_num = port_num
 
 
 def bind_to_port(port):
