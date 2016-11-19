@@ -1,5 +1,8 @@
 
-import socket, random, sys
+from socket import *
+import random
+import sys
+import thread
 
 
 class ClientNode (object):
@@ -20,8 +23,13 @@ class ClientNode (object):
     self.port_num = port_num
 
 
-def bind_to_port(port):
-  return False;
+def bind_to_port(s, port):
+  host = socket.gethostname()
+  try:
+    s.bind((host, port))
+  except socket.error:
+    return False
+  return True
 
 
 def bind_to_random(tries=10, start=40000, stop=50000):
