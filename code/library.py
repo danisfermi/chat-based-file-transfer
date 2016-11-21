@@ -9,22 +9,60 @@ class ClientNode (object):
   """
   Class object for holding client related information
   """
-  def __init__(self, ip, hostname, username, port_num):
+  def __init__(self, ip, socket, user_id):
     """
     Save client info ip, hostname and username.
     :param ip:
-    :param hostname:
+    :param socket:
     :param username:
     :param port_num
     """
     self.ip = ip
-    self.hostname = hostname
-    self.username = username
-    self.port_num = port_num
+    self.socket = socket
+    self.username = user_id
+
+
+def send_data(data):
+  #TODO
+  return False
+
+
+def send_ok(socket):
+  #TODO
+  msg = 'OK'
+  send_data(msg)
+
+
+def send_err(socket, err_msg):
+  #TODO
+  msg = 'ERROR|' + err_msg
+  send_data(msg)
+
+
+def send_list(socket, list):
+  #TODO
+  msg = "|".join(list)
+  return send_data(msg)
+
+
+def recv_data(socket):
+  try:
+    recv_buf = socket.recv(4096)
+  except socket.error:
+    print 'recv_data error'
+    recv_buf = 0
+  return recv_buf
+
+
+def decode_data(recv_buf):
+  recv_buf = recv_buf.decode()
+  message = recv_buf.split("|")
+  print message
+  return message
 
 
 def bind_to_port(s, port):
-  host = socket.gethostname()
+  host = gethostname()
   try:
     s.bind((host, port))
   except socket.error:
