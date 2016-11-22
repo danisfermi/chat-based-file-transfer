@@ -5,38 +5,23 @@ import sys
 import thread
 
 
-class ClientNode (object):
-  """
-  Class object for holding client related information
-  """
-  def __init__(self, ip, socket, user_id):
-    """
-    Save client info ip, hostname and username.
-    :param ip:
-    :param socket:
-    :param username:
-    :param port_num
-    """
-    self.ip = ip
-    self.socket = socket
-    self.username = user_id
 
 
-def send_data(data):
+def send_data(socket, data):
   #TODO
   return False
 
 
-def send_ok(socket):
+def send_ok(socket, opt_msg=''):
   #TODO
-  msg = 'OK'
-  send_data(msg)
+  msg = 'OK|' + opt_msg
+  send_data(socket, msg)
 
 
 def send_err(socket, err_msg):
   #TODO
   msg = 'ERROR|' + err_msg
-  send_data(msg)
+  send_data(socket, msg)
 
 
 def send_list(socket, list):
