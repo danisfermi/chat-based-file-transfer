@@ -5,11 +5,12 @@ import sys
 import thread
 
 
-
-
 def send_data(socket, data):
   #TODO
-  return False
+  try:
+    socket.sendall(data+'\n')
+  except error:
+    print 'sendall data error'
 
 
 def send_ok(socket, opt_msg=''):
@@ -27,13 +28,13 @@ def send_err(socket, err_msg):
 def send_list(socket, list):
   #TODO
   msg = "|".join(list)
-  return send_data(msg)
+  return send_data(socket, msg)
 
 
 def recv_data(socket):
   try:
     recv_buf = socket.recv(4096)
-  except socket.error:
+  except error:
     print 'recv_data error'
     recv_buf = 0
   return recv_buf
@@ -41,6 +42,7 @@ def recv_data(socket):
 
 def decode_data(recv_buf):
   recv_buf = recv_buf.decode()
+  recv_buf = str(recv_buf[:-2])  # Remove \r\n at the end of each message
   message = recv_buf.split("|")
   print message
   return message
@@ -50,7 +52,7 @@ def bind_to_port(s, port):
   host = gethostname()
   try:
     s.bind((host, port))
-  except socket.error:
+  except error:
     return False
   return True
 
