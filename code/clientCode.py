@@ -2,7 +2,7 @@
 from socket import *
 from library import *
 
-serverList = ["127.0.0.1", "192.168.0.100"]  # 2 server IP's to be added here
+serverList = ["127.0.0.1", "192.168.0.100", "10.139.63.161"]  # 2 server IP's to be added here
 serverPort = [i for i in xrange(20000, 20009)]
 
 clientSocket = socket(AF_INET, SOCK_STREAM)

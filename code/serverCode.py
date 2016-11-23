@@ -16,7 +16,8 @@ class Server(object):
     However, the client object has a self.suspended field to check if the client is active.
     """
     self.s = socket(AF_INET, SOCK_STREAM)
-    self.listen_port = 0
+    self.port = 0
+    self.ip = gethostbyname(gethostname())
     self.clients = []
     self.chatrooms = []
     self.client_count = 0
@@ -48,7 +49,7 @@ class Server(object):
       #TODO
       for id in self.clients:
         client = self.server.clients[id]
-        if not client.suspended and client.username is username:
+        if not client.suspended and client.username == username:
           return client
       return None
 
@@ -63,7 +64,6 @@ class Server(object):
           client_list.append(client.username)
       return client_list
 
-
     def broadcast(self, msg, source=None):
       """
       Function to broadcast a message from some source to all other clients in chatroom
@@ -74,9 +74,9 @@ class Server(object):
       if source:
         msg = '#' + source + '|' + msg
       for i in xrange(len(self.clients)):
-        client_id = self.clients[i].client_id
+        client_id = self.clients[i]
         clients = self.server.clients
-        if clients[client_id].name is not source:
+        if clients[client_id].username != source:
           send_data(clients[client_id].socket, msg)
         else:
           flag = True
@@ -95,7 +95,7 @@ class Server(object):
       :param socket: Socket at server used to communicate with client.
       :param client_id:
       """
-      # TODO: Client ID cant be used to index clients array if previous clients have exitted.
+      # TODO: Client ID cant be used to index clients array if previous clients have exited.
       self.server = server_reference
       self.ip = ip
       self.socket = socket
@@ -109,31 +109,22 @@ class Server(object):
       This is the main per-client execution thread for the server.
       Enable a client to login and proceed to listen to, and forward, its messages.
       """
+      msg = 'Connected to ' + self.server.ip + ' at port ' + str(self.server.port)
+      msg += '\nPlease enter your username'
+      send_data(self.socket, msg)
       self.accept_login()
+      msg = 'Welcome to ' + self.chatroom.name + '. You are all set to pass messages'
+      send_data(self.socket, msg)
       while not self.suspended:
         self.accept_message()
+      self.socket.close()
 
     def accept_login(self):
       """
       Establish the clients username and create a new chatroom, or add it to an existing one.
       """
       self.check_username()
-      self.check_chatroom()
-
-    # def check_tries(self, tries, func, err_msg):
-    #   """
-    #   Function that repeats a func method if there are enough tries left.
-    #   :param tries: Number of tries left
-    #   :param func: Method to be repeated in case of an incoherent message.
-    #   :param err_msg: Error message to be displayed, if there are tries left.
-    #   """
-    #   logging.info('Check_tries')
-    #   if tries > 0:
-    #     send_err(self.socket, err_msg)
-    #     func(tries - 1)
-    #   else:
-    #     send_err(self.socket, 'Max tries reached, closing connection.')
-    #     self.suspended = True
+      self.create_or_join()
 
     def check_username(self, tries=5):
       """
@@ -143,7 +134,7 @@ class Server(object):
       msg = decode_data(recv_data(self.socket))
       name = msg[0]
       usernames = [i.username for i in self.server.clients]
-      if name in usernames:
+      if name in usernames + ['server', 'all']:  # 'all', 'server' not valid usernames
         if tries > 0:
           send_err(self.socket, 'Username taken, kindly choose another.')
           self.check_username(tries - 1)
@@ -155,11 +146,11 @@ class Server(object):
         send_ok(self.socket, 'Username ' + name + ' accepted. Send create/join a chatroom')
       return
 
-    def check_chatroom(self, tries=5):
+    def create_or_join(self, tries=5):
       """
       Check if client wants to create a new chatroom or join an existing one.
       """
-      logging.info('Check_chatroom')
+      logging.info('create_or_join')
       if self.suspended:
         return
       msg = decode_data(recv_data(self.socket))
@@ -170,19 +161,19 @@ class Server(object):
       elif option == 'join':  # Join existing chatroom - Send list of availables.
         if len(self.server.chatrooms):
           send_ok(self.socket, 'Here is a list of chatrooms you can join.')
-          send_list(self.socket, self.server.chatrooms)
+          send_list(self.socket, self.server.get_chatrooms())
           self.join_chatroom()
         else:  # There are no chatrooms to join
           if tries > 0:
             send_err(self.socket, 'There are no chatrooms to join now')
-            self.check_chatroom(tries - 1)
+            self.create_or_join(tries - 1)
           else:
             send_err(self.socket, 'Max tries reached, closing connection.')
             self.suspended = True
       else:
         if tries > 0:
           send_err(self.socket, 'Sorry, specify join/create to join or create a chatroom')
-          self.check_chatroom(tries - 1)
+          self.create_or_join(tries - 1)
         else:
           send_err(self.socket, 'Max tries reached, closing connection.')
           self.suspended = True
@@ -245,19 +236,20 @@ class Server(object):
       # TODO
       msg = decode_data(recv_data(self.socket))
       destination = msg[0]
-      if destination[:1] is not '@':
+      if destination[:1] != '@':
         send_err(self.socket, 'Sorry, first field in message should be @<destination>')
         return
       destination = destination[1:]
-      print destination
       msg[0] = '#' + self.username
-      if destination is 'all':
-        # TODO: Make sure 'all', 'server' is not a valid username
+      if destination == 'all':
         self.chatroom.broadcast_msg('|'.join(msg))
-      elif destination is 'server':
+      elif destination == 'server':
         # TODO: This piece of code may need more features
-        if msg[1].lower() is 'exit' or 'quit':
-          self.suspended = True
+        if len(msg) > 1:
+          if msg[1].lower() in ['exit', 'quit']:
+            self.suspended = True
+          else:  # Just deliver the message to server console
+            print '|'.join(msg[1:])
       else:
         dest_client = self.chatroom.get_client(destination)
         if dest_client is None:
@@ -267,6 +259,13 @@ class Server(object):
 
 
   # Server class functions follow
+
+  def get_chatrooms(self):
+    names = []
+    for c in self.chatrooms:
+      names.append(c.name)
+    # print names
+    return names
 
   def go_online(self, start=20000, tries=10):
     """
@@ -287,7 +286,7 @@ class Server(object):
     self.s.listen(25)
     print 'Server is listening at', listen_port
     # data_port = library.bind_to_random(tries)  # bind to a random port for data
-    self.listen_port = listen_port
+    self.port = listen_port
 
   def execute(self):
     """
@@ -301,7 +300,8 @@ class Server(object):
       self.client_count += 1
       self.clients.append(client)
       print 'Incoming connection from', addr
-      thread.start_new_thread(client.execute())
+      empty_tuple = ()
+      thread.start_new_thread(client.execute, empty_tuple)
 
 
 s1 = Server()
