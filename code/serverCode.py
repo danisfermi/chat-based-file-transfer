@@ -87,6 +87,7 @@ class Server(object):
       # TODO: The following code seems to be working fine,
       # TODO: but there is a sendall data error triggered by send when lone client tries to broadcast
       # TODO: This is repeated on any subsequent broadcast, but doesnt come on a unicast.
+      # if self.server.
       if source is None:
         for client_id in self.clients:
           clients = self.server.clients
@@ -133,6 +134,7 @@ class Server(object):
         send_data(self.socket, msg)
       while not self.suspended:
         self.accept_message()
+      self.chatroom.clients.remove(self.client_id)
       self.socket.close()
 
     def accept_login(self):
@@ -174,7 +176,7 @@ class Server(object):
       if option == 'create':  # Create chatroom - check chatroom name
         send_ok(self.socket, 'Specify a chatroom name to create.\n')
         self.create_chatroom()
-      elif option == 'join':  # Join existing chatroom - Send list of availables.
+      elif option == 'join':  # Join existing chatroom - Send list of available peers.
         if len(self.server.chatrooms):
           send_ok(self.socket, 'Here is a list of chatrooms you can join.\n')
           send_list(self.socket, self.server.get_chatrooms())
@@ -230,11 +232,14 @@ class Server(object):
       for room in self.server.chatrooms:
         if name == room.name:
           room.broadcast('INFO| New user ' + self.username + ' has joined\n', self.username)
+          send_ok(self.socket, 'You have joined chatroom - ' + name + '\n')
+          if len(room.clients):
+            send_data(self.socket, 'Here is a list of peers in the room:\n')
+            send_list(self.socket, self.chatroom.get_usernames())
+          else:
+            send_data(self.socket, 'There are no peers in the room:\n')
           room.clients.append(self.client_id)
           self.chatroom = room
-          send_ok(self.socket, 'You have joined chatroom - ' + name + '\n')
-          send_data(self.socket, 'Here is a list of peers in the room:\n')
-          send_list(self.socket, self.chatroom.get_usernames())
           return
       if tries > 0:
         send_err(self.socket, 'Sorry, chatroom name not found. Please try again.\n')

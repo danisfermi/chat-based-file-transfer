@@ -7,8 +7,14 @@ class Client(object):
 
   """
   def __init__(self, pport=None, sport=None, ip=None, start=7744, tries=10):
+    """
 
-
+    :param pport:
+    :param sport:
+    :param ip:
+    :param start:
+    :param tries:
+    """
     self.socket = socket(AF_INET, SOCK_STREAM)
 
     # if port is None or ip is None:
@@ -41,10 +47,12 @@ class Client(object):
   def listen_to_server(self):
     while True:
       msg = client_recv(self.socket)
+      if msg == '':
+        break
 
   def execute(self):
     empty_tuple = ()
-    thread.start_new_thread(self.listen_to_server(), empty_tuple)
+    thread.start_new_thread(self.listen_to_server, empty_tuple)
     while True:
       input = raw_input()
       client_send(self.socket, input)
@@ -52,8 +60,4 @@ class Client(object):
 print int(sys.argv[3]), int(sys.argv[2]), sys.argv[1]
 c1 = Client(int(sys.argv[3]), int(sys.argv[2]), sys.argv[1]);
 c1.execute()
-
-
-
-
 
