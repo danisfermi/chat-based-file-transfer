@@ -46,6 +46,7 @@ def decode_data(recv_buf):
     recv_buf = str(recv_buf[:-2])  # Remove \r\n at the end of each message
   except UnicodeDecodeError:
     print 'Unexpected byte stream in received data'
+    #TODO make sure the server does not exit.
     thread.exit()
   message = recv_buf.split("|")
   print message

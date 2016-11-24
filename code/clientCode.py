@@ -1,12 +1,17 @@
 #! /usr/bin/python
 from socket import *
 from library import *
+import errno
 
-serverList = ["127.0.0.1", "192.168.0.100", "10.139.63.161"]  # 2 server IP's to be added here
+
+# class Client(object):
+
+
+serverList = ["127.0.0.1", "192.168.0.100", "10.139.63.161", "10.139.62.88"]  # 2 server IP's to be added here
 serverPort = [i for i in xrange(20000, 20009)]
 
 clientSocket = socket(AF_INET, SOCK_STREAM)
-bind_to_port(clientSocket, 7733)
+print bind_to_port(clientSocket, 7733)
 
 connectFlag = False
 for i in serverList:
@@ -17,8 +22,8 @@ for i in serverList:
       print "You are now connected to Server " + i + " on Port Number" + j
       connectFlag = True
       break
-    except:
-      continue
+    except error as serr:
+      print serr
 
 if connectFlag is False:
   sys.exit('Connection Error. Please try again later')
@@ -28,7 +33,8 @@ def listen_to_server():
     msg = decode_data(recv_data(clientSocket))
     print msg
 
-thread.start_new_thread(listen_to_server())
+empty_tuple = ()
+thread.start_new_thread(listen_to_server(), empty_tuple)
 while True:
   input = raw_input()
   send_data(clientSocket, input)

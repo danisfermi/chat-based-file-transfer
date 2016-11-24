@@ -73,10 +73,9 @@ class Server(object):
       flag = False
       if source:
         msg = '#' + source + '|' + msg
-      for i in xrange(len(self.clients)):
-        client_id = self.clients[i]
+      for client_id in self.clients:
         clients = self.server.clients
-        if clients[client_id].username != source:
+        if not source or source != clients[client_id].username:
           send_data(clients[client_id].socket, msg)
         else:
           flag = True
@@ -113,8 +112,9 @@ class Server(object):
       msg += '\nPlease enter your username'
       send_data(self.socket, msg)
       self.accept_login()
-      msg = 'Welcome to ' + self.chatroom.name + '. You are all set to pass messages'
-      send_data(self.socket, msg)
+      if not self.suspended:
+        msg = 'Welcome to ' + self.chatroom.name + '. You are all set to pass messages'
+        send_data(self.socket, msg)
       while not self.suspended:
         self.accept_message()
       self.socket.close()
@@ -213,7 +213,7 @@ class Server(object):
       name = msg[0]
       for room in self.server.chatrooms:
         if name == room.name:
-          room.broadcast('INFO| New user ' + self.username + ' has joined', 'Server')
+          room.broadcast('INFO| New user ' + self.username + ' has joined', self.username)
           room.clients.append(self.client_id)
           self.chatroom = room
           send_ok(self.socket, 'You have joined chatroom - ' + name)
@@ -248,8 +248,12 @@ class Server(object):
         if len(msg) > 1:
           if msg[1].lower() in ['exit', 'quit']:
             self.suspended = True
+          elif msg[1].lower() == 'get_peers':
+            send_list(self.socket, self.chatroom.get_usernames())
+          elif msg[1].lower() == 'get_rooms':
+            send_list(self.socket, self.server.get_chatrooms())
           else:  # Just deliver the message to server console
-            print '|'.join(msg[1:])
+            print '|'.join(msg)
       else:
         dest_client = self.chatroom.get_client(destination)
         if dest_client is None:
@@ -264,7 +268,6 @@ class Server(object):
     names = []
     for c in self.chatrooms:
       names.append(c.name)
-    # print names
     return names
 
   def go_online(self, start=20000, tries=10):
