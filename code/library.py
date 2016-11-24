@@ -57,10 +57,7 @@ def decode_data(recv_buf):
 
 def bind_to_port(s, port):
   host = gethostname()
-  try:
-    s.bind(('', port))
-  except error:
-    return False
+  s.bind(('', port))
   return True
 
 
