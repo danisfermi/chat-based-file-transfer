@@ -19,7 +19,7 @@ for i in serverList:
     try:
       print i, j
       clientSocket.connect((i, j))
-      print "You are now connected to Server " + str(i) + " on Port Number" + j
+      print "You are now connected to Server " + str(i) + " on Port Number" + str(j)
       connectFlag = True
       break
     except error, exc:
