@@ -9,7 +9,7 @@ serverList = ['0.0.0.0', '127.0.0.1', '192.168.0.103', '10.139.63.161', '10.139.
 serverPort = [i for i in xrange(20000, 20009)]
 
 clientSocket = socket(AF_INET, SOCK_STREAM)
-clientSocket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
+# clientSocket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
 print bind_to_port(clientSocket, 7733)
 
 connectFlag = False
