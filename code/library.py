@@ -8,9 +8,9 @@ import thread
 def send_data(socket, data):
   #TODO
   try:
-    socket.sendall(data+'\n')
+    data_left = socket.send(data+'\n')
   except error:
-    print 'sendall data error'
+    print 'sendall data error' + data_left
 
 
 def send_ok(socket, opt_msg=''):
@@ -43,21 +43,22 @@ def recv_data(socket):
 def decode_data(recv_buf):
   try:
     recv_buf = str(recv_buf.decode())
-    recv_buf = recv_buf.replace('\r', '')  # Remove \r at the end of each message
-    recv_buf = recv_buf.replace('\n', '')  # Remove \n at the end of each message
+    if recv_buf[-2:] == '\r\n' : recv_buf = recv_buf[:-2]
+    # recv_buf = recv_buf.replace('\r', '')  # Remove \r at the end of each message
+    print recv_buf
+    # recv_buf = recv_buf.replace('\n', '')  # Remove \n at the end of each message
   except UnicodeDecodeError:
     print 'Unexpected byte stream in received data'
     #TODO make sure the server does not exit.
     thread.exit()
   message = recv_buf.split("|")
-  print message
   return message
 
 
 def bind_to_port(s, port):
   host = gethostname()
   try:
-    s.bind((host, port))
+    s.bind(('', port))
   except error:
     return False
   return True
