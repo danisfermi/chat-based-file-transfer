@@ -1,7 +1,5 @@
 #! /usr/bin/python
-from socket import *
 from library import *
-import errno
 
 
 # class Client(object):
@@ -31,20 +29,10 @@ if connectFlag is False:
 def listen_to_server():
   while True:
     msg = decode_data(recv_data(clientSocket))
-    print msg
 
 empty_tuple = ()
 thread.start_new_thread(listen_to_server(), empty_tuple)
 while True:
   input = raw_input()
   send_data(clientSocket, input)
-
-# class Client(object):
-#     info=[]
-#     def __init__(self):
-#         self.info.append(raw_input("Enter the username you wish to be identified as:"))
-#         self.info.append("")  # Delimited to be added here
-#
-#     def send(self):
-#         clientSocket.sendto(self.info.encode())
 
