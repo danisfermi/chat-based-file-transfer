@@ -6,7 +6,7 @@ from library import *
 
 
 serverList = ['0.0.0.0', '192.168.0.100', '127.0.0.1', '192.168.0.103', '10.139.63.161', '10.139.62.88', 'localhost']  # 2 server IP's to be added here
-serverPort = [i for i in xrange(30000, 30009)]
+serverPort = [i for i in xrange(50000, 50009)]
 
 clientSocket = socket(AF_INET, SOCK_STREAM)
 clientSocket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
@@ -15,14 +15,12 @@ print bind_to_port(clientSocket, 7733)
 connectFlag = False
 for i in serverList:
   for j in serverPort:
-    try:
-      print i, j
-      clientSocket.connect(('', j))
-      print "You are now connected to Server " + str(i) + " on Port Number" + str(j)
-      connectFlag = True
-      break
-    except error, exc:
-      print "Exception %s " %exc
+    print i, j
+    clientSocket.connect(('', j))
+    print "You are now connected to Server " + str(i) + " on Port Number" + str(j)
+    connectFlag = True
+    break
+
   if connectFlag is True: break
 
 if connectFlag is False:
