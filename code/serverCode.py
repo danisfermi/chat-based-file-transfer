@@ -70,17 +70,32 @@ class Server(object):
       :param msg: Raw message to be sent
       :param source: Add a from source field to message and send to all other clients
       """
-      flag = False
-      if source:
-        msg = '#' + source + '|' + msg
-      for client_id in self.clients:
-        clients = self.server.clients
-        if not source or source != clients[client_id].username:
+      # TODO: There is something wrong with this function when source is not None.
+      # source_verified = True if source is None else False
+      # if source:
+      #   msg = '#' + source + '|' + msg
+      # for client_id in self.clients:
+      #   clients = self.server.clients
+      #   if source == clients[client_id].username:
+      #     source_verified = True
+      #   else:
+      #     send_data(clients[client_id].socket, msg)
+      # if not source_verified:
+      #   print "Good Lord, why is this error coming?"
+      #   sys.exit('Source client not in chatroom client list')
+
+      # TODO: The following code seems to be working fine,
+      # TODO: but there is a sendall data error triggered by send when lone client tries to broadcast
+      # TODO: This is repeated on any subsequent broadcast, but doesnt come on a unicast.
+      if source is None:
+        for client_id in self.clients:
+          clients = self.server.clients
           send_data(clients[client_id].socket, msg)
-        else:
-          flag = True
-      if not flag:
-        sys.exit('Source client not in chatroom client list')
+      else:
+        for client_id in self.clients:
+          clients = self.server.clients
+          if source != clients[client_id].username:
+            send_data(clients[client_id].socket, msg)
 
   class ClientNode(object):
     """
@@ -95,6 +110,7 @@ class Server(object):
       :param client_id:
       """
       # TODO: Client ID cant be used to index clients array if previous clients have exited.
+      # TODO: User cannot exit and relogin with same username if entry not deleted.
       self.server = server_reference
       self.ip = ip
       self.socket = socket
@@ -242,7 +258,7 @@ class Server(object):
       destination = destination[1:]
       msg[0] = '#' + self.username
       if destination == 'all':
-        self.chatroom.broadcast('|'.join(msg)) # Changed this to broadcast. Was Broadcast_msg earlier
+        self.chatroom.broadcast('|'.join(msg), self.username)
       elif destination == 'server':
         # TODO: This piece of code may need more features
         if len(msg) > 1:
