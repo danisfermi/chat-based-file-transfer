@@ -2,36 +2,40 @@
 from library import *
 
 
-# class Client(object):
+class Client(object):
+  """
 
+  """
+  def __init__(self, start=7733, tries=10):
+    self.serverList = ['0.0.0.0', '192.168.0.100', '192.168.0.103', '127.0.0.1', '10.139.63.161', '10.139.62.88',
+                  'localhost']  # 2 server IP's to be added here
+    # self.portlist = [i for i in xrange(, 7744)]
+    self.serverPort = [i for i in xrange(50000, 50009)]
+    self.socket = socket(AF_INET, SOCK_STREAM)
+    for port in xrange(start, start+tries-1):
+      if bind_to_port(self.socket, port):
+        break
 
-serverList = ['0.0.0.0', '192.168.0.100', '127.0.0.1', '192.168.0.103', '10.139.63.161', '10.139.62.88', 'localhost']  # 2 server IP's to be added here
-serverPort = [i for i in xrange(50000, 50009)]
+    connectFlag = False
+    for s in self.serverList:
+      print s, port
+      self.socket.connect((s, port))
+      connectFlag = True
+      break
 
-clientSocket = socket(AF_INET, SOCK_STREAM)
-clientSocket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
-print bind_to_port(clientSocket, 7733)
+    if connectFlag is False:
+      sys.exit('Connection Error. Please try again later')
 
-connectFlag = False
-for i in serverList:
-  for j in serverPort:
-    print i, j
-    clientSocket.connect(('', j))
-    print "You are now connected to Server " + str(i) + " on Port Number" + str(j)
-    connectFlag = True
-    break
+    def listen_to_server():
+      while True:
+        msg = client_recv(self.socket)
 
-  if connectFlag is True: break
+    def execute():
+      empty_tuple = ()
+      thread.start_new_thread(listen_to_server(), empty_tuple)
+      while True:
+        input = raw_input()
+        client_send(self.socket, input)
 
-if connectFlag is False:
-  sys.exit('Connection Error. Please try again later')
-
-def listen_to_server():
-  while True:
-    msg = decode_data(recv_data(clientSocket))
-    input = raw_input()
-    send_data(clientSocket, input)  # Danis: I brought this here because it wasn't getting called before
-
-empty_tuple = ()
-thread.start_new_thread(listen_to_server(), empty_tuple)
-
+c1 = Client()
+c1.execute()

@@ -125,11 +125,11 @@ class Server(object):
       Enable a client to login and proceed to listen to, and forward, its messages.
       """
       msg = 'Connected to ' + self.server.ip + ' at port ' + str(self.server.port)
-      msg += '\nPlease enter your username'
+      msg += '\nPlease enter your username\n'
       send_data(self.socket, msg)
       self.accept_login()
       if not self.suspended:
-        msg = 'Welcome to ' + self.chatroom.name + '. You are all set to pass messages'
+        msg = 'Welcome to ' + self.chatroom.name + '. You are all set to pass messages\n'
         send_data(self.socket, msg)
       while not self.suspended:
         self.accept_message()
@@ -152,14 +152,14 @@ class Server(object):
       usernames = [i.username for i in self.server.clients]
       if name in usernames + ['server', 'all']:  # 'all', 'server' not valid usernames
         if tries > 0:
-          send_err(self.socket, 'Username taken, kindly choose another.')
+          send_err(self.socket, 'Username taken, kindly choose another.\n')
           self.check_username(tries - 1)
         else:
-          send_err(self.socket, 'Max tries reached, closing connection.')
+          send_err(self.socket, 'Max tries reached, closing connection.\n')
           self.suspended = True
       else:
         self.username = name
-        send_ok(self.socket, 'Username ' + name + ' accepted. Send create/join a chatroom')
+        send_ok(self.socket, 'Username ' + name + ' accepted. Send create/join a chatroom\n')
       return
 
     def create_or_join(self, tries=5):
@@ -172,26 +172,26 @@ class Server(object):
       msg = decode_data(recv_data(self.socket))
       option = str(msg[0]).lower()
       if option == 'create':  # Create chatroom - check chatroom name
-        send_ok(self.socket, 'Specify a chatroom name to create.')
+        send_ok(self.socket, 'Specify a chatroom name to create.\n')
         self.create_chatroom()
       elif option == 'join':  # Join existing chatroom - Send list of availables.
         if len(self.server.chatrooms):
-          send_ok(self.socket, 'Here is a list of chatrooms you can join.')
+          send_ok(self.socket, 'Here is a list of chatrooms you can join.\n')
           send_list(self.socket, self.server.get_chatrooms())
           self.join_chatroom()
         else:  # There are no chatrooms to join
           if tries > 0:
-            send_err(self.socket, 'There are no chatrooms to join now')
+            send_err(self.socket, 'There are no chatrooms to join now\n')
             self.create_or_join(tries - 1)
           else:
-            send_err(self.socket, 'Max tries reached, closing connection.')
+            send_err(self.socket, 'Max tries reached, closing connection.\n')
             self.suspended = True
       else:
         if tries > 0:
-          send_err(self.socket, 'Sorry, specify join/create to join or create a chatroom')
+          send_err(self.socket, 'Sorry, specify join/create to join or create a chatroom\n')
           self.create_or_join(tries - 1)
         else:
-          send_err(self.socket, 'Max tries reached, closing connection.')
+          send_err(self.socket, 'Max tries reached, closing connection.\n')
           self.suspended = True
 
     def create_chatroom(self, tries=5):
@@ -206,16 +206,16 @@ class Server(object):
       name, names = msg[0], [i.name for i in self.server.chatrooms]
       if name in names:
         if tries > 0:
-          send_err(self.socket, 'Sorry, chatroom already taken. Please try again.')
+          send_err(self.socket, 'Sorry, chatroom already taken. Please try again.\n')
           self.create_chatroom(tries - 1)
         else:
-          send_err(self.socket, 'Max tries reached, closing connection.')
+          send_err(self.socket, 'Max tries reached, closing connection.\n')
           self.suspended = True
       else:
         new_room = self.server.ChatRoom(self.server, name, self.client_id)
         self.server.chatrooms.append(new_room)
         self.chatroom = new_room
-        send_ok(self.socket, 'Chatroom ' + name + ' created. Press Enter to continue') # Danis: Added this for logic
+        send_ok(self.socket, 'Chatroom ' + name + ' created.\n')
 
     def join_chatroom(self, tries=5):
       """
@@ -229,18 +229,18 @@ class Server(object):
       name = msg[0]
       for room in self.server.chatrooms:
         if name == room.name:
-          room.broadcast('INFO| New user ' + self.username + ' has joined', self.username)
+          room.broadcast('INFO| New user ' + self.username + ' has joined\n', self.username)
           room.clients.append(self.client_id)
           self.chatroom = room
-          send_ok(self.socket, 'You have joined chatroom - ' + name)
-          send_data(self.socket, 'Here is a list of peers in the room:')
+          send_ok(self.socket, 'You have joined chatroom - ' + name + '\n')
+          send_data(self.socket, 'Here is a list of peers in the room:\n')
           send_list(self.socket, self.chatroom.get_usernames())
           return
       if tries > 0:
-        send_err(self.socket, 'Sorry, chatroom name not found. Please try again.')
+        send_err(self.socket, 'Sorry, chatroom name not found. Please try again.\n')
         self.join_chatroom(tries - 1)
       else:
-        send_err(self.socket, 'Max tries reached, closing connection.')
+        send_err(self.socket, 'Max tries reached, closing connection.\n')
         self.suspended = True
 
     def accept_message(self):
@@ -253,7 +253,7 @@ class Server(object):
       msg = decode_data(recv_data(self.socket))
       destination = msg[0]
       if destination[:1] != '@':
-        send_err(self.socket, 'Sorry, first field in message should be @<destination>')
+        send_err(self.socket, 'Sorry, first field in message should be @<destination>\n')
         return
       destination = destination[1:]
       msg[0] = '#' + self.username
@@ -273,7 +273,7 @@ class Server(object):
       else:
         dest_client = self.chatroom.get_client(destination)
         if dest_client is None:
-          send_err(self.socket, 'Sorry, destination client not present in chatroom')
+          send_err(self.socket, 'Sorry, destination client not present in chatroom\n')
         else:
           send_list(dest_client.socket, msg)
 

@@ -5,10 +5,33 @@ import sys
 import thread
 
 
+def client_send(s, data):
+  try:
+    s.sendall(data)
+  except error:
+    print 'sendall data error'
+
+
+def client_recv(s):
+  try:
+    recv = s.recv(4096)
+    recv = str(recv)
+  except UnicodeDecodeError:
+    print 'Unexpected byte stream in received data'
+  except error:
+    print 'recv_data error'
+  if recv[-1:] == '\n':
+    recv = recv[:-1]
+  print recv
+  message = recv.split("|")
+  return message
+
+
+
 def send_data(socket, data):
   #TODO
   try:
-    data_left = socket.send(data+'\n')
+    data_left = socket.send(data)
   except error:
     print 'sendall data error' + data_left
 
@@ -27,23 +50,25 @@ def send_err(socket, err_msg):
 
 def send_list(socket, list):
   #TODO
-  msg = "|".join(list)
+  msg = "|".join(list) + '\n'
   return send_data(socket, msg)
 
 
-def recv_data(socket):
+def recv_data(s):
   try:
-    recv_buf = socket.recv(4096)
+    recv_buf = s.recv(4096)
   except error:
     print 'recv_data error'
-    recv_buf = 0
   return recv_buf
 
 
 def decode_data(recv_buf):
   try:
     recv_buf = str(recv_buf.decode())
-    if recv_buf[-2:] == '\r\n' : recv_buf = recv_buf[:-2]
+    if recv_buf[-2:] == '\r\n':
+      recv_buf = recv_buf[:-2]
+    elif recv_buf[-1:] == '\n':
+      recv_buf = recv_buf[:-1]
     # recv_buf = recv_buf.replace('\r', '')  # Remove \r at the end of each message
     print recv_buf
     # recv_buf = recv_buf.replace('\n', '')  # Remove \n at the end of each message
@@ -56,8 +81,10 @@ def decode_data(recv_buf):
 
 
 def bind_to_port(s, port):
-  host = gethostname()
-  s.bind(('', port))
+  try:
+    s.bind(('', port))
+  except error:
+    return False
   return True
 
 
@@ -76,9 +103,4 @@ def bind_to_random(tries=10, start=40000, stop=50000):
     print "Couldn't bind to data port. Aborting..."
     sys.exit()
   return port
-
-
-def make_packet(data, ip):
-  packet = data
-  return packet
 
