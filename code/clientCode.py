@@ -29,10 +29,9 @@ if connectFlag is False:
 def listen_to_server():
   while True:
     msg = decode_data(recv_data(clientSocket))
+    input = raw_input()
+    send_data(clientSocket, input)  # Danis: I brought this here because it wasn't getting called before
 
 empty_tuple = ()
 thread.start_new_thread(listen_to_server(), empty_tuple)
-while True:
-  input = raw_input()
-  send_data(clientSocket, input)
 
