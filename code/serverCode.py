@@ -199,7 +199,7 @@ class Server(object):
         new_room = self.server.ChatRoom(self.server, name, self.client_id)
         self.server.chatrooms.append(new_room)
         self.chatroom = new_room
-        send_ok(self.socket, 'Chatroom ' + name + ' created.')
+        send_ok(self.socket, 'Chatroom ' + name + ' created. Press Enter to continue') # Danis: Added this for logic
 
     def join_chatroom(self, tries=5):
       """
@@ -242,7 +242,7 @@ class Server(object):
       destination = destination[1:]
       msg[0] = '#' + self.username
       if destination == 'all':
-        self.chatroom.broadcast_msg('|'.join(msg))
+        self.chatroom.broadcast('|'.join(msg)) # Changed this to broadcast. Was Broadcast_msg earlier
       elif destination == 'server':
         # TODO: This piece of code may need more features
         if len(msg) > 1:
