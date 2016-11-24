@@ -47,7 +47,7 @@ class Client(object):
   def listen_to_server(self):
     while True:
       msg = client_recv(self.socket)
-      if msg == '':
+      if msg.lower() in ['exit', 'quit']:
         break
 
   def execute(self):

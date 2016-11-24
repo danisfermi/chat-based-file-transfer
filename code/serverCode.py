@@ -135,6 +135,7 @@ class Server(object):
       while not self.suspended:
         self.accept_message()
       self.chatroom.clients.remove(self.client_id)
+      send_data(self.socket, 'exit')
       self.socket.close()
 
     def accept_login(self):
@@ -233,13 +234,13 @@ class Server(object):
         if name == room.name:
           room.broadcast('INFO| New user ' + self.username + ' has joined\n', self.username)
           send_ok(self.socket, 'You have joined chatroom - ' + name + '\n')
+          self.chatroom = room
           if len(room.clients):
             send_data(self.socket, 'Here is a list of peers in the room:\n')
             send_list(self.socket, self.chatroom.get_usernames())
           else:
             send_data(self.socket, 'There are no peers in the room:\n')
           room.clients.append(self.client_id)
-          self.chatroom = room
           return
       if tries > 0:
         send_err(self.socket, 'Sorry, chatroom name not found. Please try again.\n')
