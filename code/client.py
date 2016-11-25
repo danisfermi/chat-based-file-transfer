@@ -1,12 +1,15 @@
 #! /usr/bin/python
 from library import *
 from UDPClient import *
+import fnmatch
+import os
+import random
 
 class Client(object):
   """
 
   """
-  def __init__(self, pport=None, sport=None, ip=None, start=7744, tries=10):
+  def __init__(self, sport=None, ip=None, start=7744, tries=10):
     """
 
     :param pport:
@@ -17,6 +20,7 @@ class Client(object):
     """
     self.socket = socket(AF_INET, SOCK_STREAM)
     self.suspended = False
+    self.pport = random.randrange(23456, 24567)
 
     # if port is None or ip is None:
     #   self.serverList = ['0.0.0.0', '192.168.0.100', '192.168.0.103', '127.0.0.1', '10.139.63.161', '10.139.62.88',
@@ -41,13 +45,19 @@ class Client(object):
     #   if connectFlag is False:
     #     sys.exit('Connection Error. Please try again later')
     # else:
-    print ip, pport, sport
-    self.socket.bind(('', pport))
+    print ip, self.pport, sport
+    self.socket.bind(('', self.pport))
     self.socket.connect((ip, sport))
     
   def check_file(self, filename):
     """
+    iterate over file-folder and check if the filename is available
     """
+    for filenm in os.listdir('Folder'):
+      if fnmatch.fnmatch(filenm, 'filename'):
+        return True
+      else:
+        return False
 
   def listen_to_server(self):
     while not self.suspended:
@@ -75,7 +85,7 @@ class Client(object):
       input = raw_input()
       client_send(self.socket, input)
 
-print int(sys.argv[3]), int(sys.argv[2]), sys.argv[1]
-c1 = Client(int(sys.argv[3]), int(sys.argv[2]), sys.argv[1]);
+print int(sys.argv[2]), sys.argv[1]
+c1 = Client(int(sys.argv[2]), sys.argv[1]);
 c1.execute()
 
