@@ -16,6 +16,7 @@ class Client(object):
     :param tries:
     """
     self.socket = socket(AF_INET, SOCK_STREAM)
+    self.suspended = False
 
     # if port is None or ip is None:
     #   self.serverList = ['0.0.0.0', '192.168.0.100', '192.168.0.103', '127.0.0.1', '10.139.63.161', '10.139.62.88',
@@ -45,15 +46,16 @@ class Client(object):
     self.socket.connect((ip, sport))
 
   def listen_to_server(self):
-    while True:
+    while not self.suspended:
       msg = client_recv(self.socket)
-      if msg.lower() in ['exit', 'quit']:
-        break
+      if msg[0].lower() in ['exit', 'quit']:
+        print "Thank You for using our chatroom. Press enter to continue."
+        self.suspended = True
 
   def execute(self):
     empty_tuple = ()
     thread.start_new_thread(self.listen_to_server, empty_tuple)
-    while True:
+    while not self.suspended:
       input = raw_input()
       client_send(self.socket, input)
 
