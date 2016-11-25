@@ -21,6 +21,7 @@ class Client(object):
     self.socket = socket(AF_INET, SOCK_STREAM)
     self.suspended = False
     self.pport = random.randrange(23456, 24567)
+    self.ip = gethostbyaddr(gethostname())
 
     # if port is None or ip is None:
     #   self.serverList = ['0.0.0.0', '192.168.0.100', '192.168.0.103', '127.0.0.1', '10.139.63.161', '10.139.62.88',
@@ -84,6 +85,12 @@ class Client(object):
     while not self.suspended:
       input = raw_input()
       client_send(self.socket, input)
+      input = input.rstrip('\n')
+      input = input.split("|")
+      empty_tuple = ()
+      udpserver = UDPServer(self, input[0], input[1])
+      thread.start_new_thread(udpserver.execute, empty_tuple)
+
 
 print int(sys.argv[2]), sys.argv[1]
 c1 = Client(int(sys.argv[2]), sys.argv[1]);
