@@ -1,6 +1,6 @@
 #! /usr/bin/python
 from library import *
-
+from UDPClient import *
 
 class Client(object):
   """
@@ -44,6 +44,10 @@ class Client(object):
     print ip, pport, sport
     self.socket.bind(('', pport))
     self.socket.connect((ip, sport))
+    
+  def check_file(self, filename):
+    """
+    """
 
   def listen_to_server(self):
     while not self.suspended:
@@ -51,6 +55,18 @@ class Client(object):
       if msg[0].lower() in ['exit', 'quit']:
         print "Thank You for using our chatroom. Press enter to continue."
         self.suspended = True
+      elif msg[1].lower() in ['whohas']:
+        if self.check_file(msg[2]):
+          send_msg = '@' + msg[1][1:] + '|ME'
+          client_send(self.socket, send_msg)
+      elif msg[1].lower() in ['getfile']:
+        if not self.check_file(msg[2]):
+          send_msg = '@' + msg[1][1:] + '|ERROR| File Not Found'
+          client_send(self.socket, send_msg)
+        else:
+          empty_tuple = ()
+          udpclient = UDPClient(self, msg)
+          thread.start_new_thread(udpclient.execute, empty_tuple)
 
   def execute(self):
     empty_tuple = ()
