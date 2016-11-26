@@ -1,6 +1,7 @@
 #! /usr/bin/python
 from library import *
 from UDPClient import *
+from UDPServer import *
 import fnmatch
 import os
 import random
@@ -66,18 +67,19 @@ class Client(object):
       if msg[0].lower() in ['exit', 'quit']:
         print "Thank You for using our chatroom. Press enter to continue."
         self.suspended = True
-      elif msg[1].lower() in ['whohas']:
-        if self.check_file(msg[2]):
-          send_msg = '@' + msg[1][1:] + '|ME'
-          client_send(self.socket, send_msg)
-      elif msg[1].lower() in ['getfile']:
-        if not self.check_file(msg[2]):
-          send_msg = '@' + msg[1][1:] + '|ERROR| File Not Found'
-          client_send(self.socket, send_msg)
-        else:
-          empty_tuple = ()
-          udpclient = UDPClient(self, msg)
-          thread.start_new_thread(udpclient.execute, empty_tuple)
+      elif len(msg) > 1:
+        if msg[1].lower() in ['whohas']:
+          if self.check_file(msg[2]):
+            send_msg = '@' + msg[1][1:] + '|ME'
+            client_send(self.socket, send_msg)
+        elif msg[1].lower() in ['getfile']:
+          if not self.check_file(msg[2]):
+            send_msg = '@' + msg[1][1:] + '|ERROR| File Not Found'
+            client_send(self.socket, send_msg)
+          else:
+            empty_tuple = ()
+            udpclient = UDPClient(self, msg)
+            thread.start_new_thread(udpclient.execute, empty_tuple)
 
   def execute(self):
     empty_tuple = ()
@@ -87,9 +89,10 @@ class Client(object):
       client_send(self.socket, input)
       input = input.rstrip('\n')
       input = input.split("|")
-      empty_tuple = ()
-      udpserver = UDPServer(self, input[0], input[1])
-      thread.start_new_thread(udpserver.execute, empty_tuple)
+      if len(input) > 1 and input[1] == 'getfile':
+        empty_tuple = ()
+        udpserver = UDPServer(self, input[0], input[1])
+        thread.start_new_thread(udpserver.execute, empty_tuple)
 
 
 print int(sys.argv[2]), sys.argv[1]
