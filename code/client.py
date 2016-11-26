@@ -64,8 +64,8 @@ class Client(object):
             client_send(self.socket, send_msg)
         elif msg[1].lower() in ['getfile']:
           empty_tuple = ()
-          udpclient = UDPClient(self, msg)
-          thread.start_new_thread(udpclient.execute, empty_tuple)
+          udpserver = UDPServer(self, msg)
+          thread.start_new_thread(udpserver.execute, empty_tuple)
 
   def execute(self):
     empty_tuple = ()
@@ -77,8 +77,8 @@ class Client(object):
       input = input.split("|")
       if len(input) > 1 and input[1] == 'getfile':
         empty_tuple = ()
-        udpserver = UDPServer(self, input)
-        thread.start_new_thread(udpserver.execute, empty_tuple)
+        udpclient = UDPClient(self, input)
+        thread.start_new_thread(udpclient.execute, empty_tuple)
 
 
 print int(sys.argv[2]), sys.argv[1]
