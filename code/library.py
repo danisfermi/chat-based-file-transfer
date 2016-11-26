@@ -7,7 +7,7 @@ import thread
 
 def client_send(s, data):
   try:
-    s.sendall(data)
+    s.sendall(data.encode())
   except error:
     print 'sendall data error'
 
@@ -15,7 +15,7 @@ def client_send(s, data):
 def client_recv(s):
   try:
     recv = s.recv(4096)
-    recv = str(recv)
+    recv = str(recv.decode())
   except UnicodeDecodeError:
     print 'Unexpected byte stream in received data'
   except error:
@@ -31,7 +31,7 @@ def client_recv(s):
 def send_data(socket, data):
   #TODO
   try:
-    data_left = socket.send(data)
+    data_left = socket.send(data.encode())
   except error:
     print 'sendall data error' + data_left
 
@@ -88,7 +88,7 @@ def bind_to_port(s, port):
   return True
 
 
-def bind_to_random(tries=10, start=40000, stop=50000):
+def bind_to_random(s, tries=10, start=40000, stop=50000):
   """
   Try to bind to random port from start to stop port numbers, tries number of times.
   :param tries:
@@ -98,7 +98,7 @@ def bind_to_random(tries=10, start=40000, stop=50000):
   """
   while tries > 0:
     port = random.randint(start, stop-1)
-    tries = -1 if bind_to_port(port) else tries - 1
+    tries = -1 if bind_to_port(s, port) else tries - 1
   if tries is 0:
     print "Couldn't bind to data port. Aborting..."
     sys.exit()

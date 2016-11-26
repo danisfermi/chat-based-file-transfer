@@ -50,16 +50,6 @@ class Client(object):
     print ip, self.pport, sport
     self.socket.bind(('', self.pport))
     self.socket.connect((ip, sport))
-    
-  def check_file(self, filename):
-    """
-    iterate over file-folder and check if the filename is available
-    """
-    for filenm in os.listdir('Folder'):
-      if fnmatch.fnmatch(filenm, 'filename'):
-        return True
-      else:
-        return False
 
   def listen_to_server(self):
     while not self.suspended:
@@ -70,16 +60,12 @@ class Client(object):
       elif len(msg) > 1:
         if msg[1].lower() in ['whohas']:
           if self.check_file(msg[2]):
-            send_msg = '@' + msg[1][1:] + '|ME'
+            send_msg = '@' + msg[0][1:] + '|ME'
             client_send(self.socket, send_msg)
         elif msg[1].lower() in ['getfile']:
-          if not self.check_file(msg[2]):
-            send_msg = '@' + msg[1][1:] + '|ERROR| File Not Found'
-            client_send(self.socket, send_msg)
-          else:
-            empty_tuple = ()
-            udpclient = UDPClient(self, msg)
-            thread.start_new_thread(udpclient.execute, empty_tuple)
+          empty_tuple = ()
+          udpclient = UDPClient(self, msg)
+          thread.start_new_thread(udpclient.execute, empty_tuple)
 
   def execute(self):
     empty_tuple = ()
@@ -91,7 +77,7 @@ class Client(object):
       input = input.split("|")
       if len(input) > 1 and input[1] == 'getfile':
         empty_tuple = ()
-        udpserver = UDPServer(self, input[0], input[1])
+        udpserver = UDPServer(self, input)
         thread.start_new_thread(udpserver.execute, empty_tuple)
 
 
