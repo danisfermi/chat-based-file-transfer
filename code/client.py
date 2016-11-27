@@ -6,50 +6,36 @@ import fnmatch
 import os
 import random
 
+
 class Client(object):
   """
-
+  Class object that stores peer information
   """
-  def __init__(self, sport=None, ip=None, start=7744, tries=10):
+  def __init__(self, ip=None, sport=None, start=50000, tries=10):
     """
-
-    :param pport:
-    :param sport:
-    :param ip:
-    :param start:
-    :param tries:
+    Connect to server: Server uses some port between 50000 and 50009
     """
     self.socket = socket(AF_INET, SOCK_STREAM)
     self.suspended = False
-    self.pport = random.randrange(23456, 24567)
+    self.pport = bind_to_random(self.socket)
     self.ip = gethostbyname(gethostname())
 
-    # if port is None or ip is None:
-    #   self.serverList = ['0.0.0.0', '192.168.0.100', '192.168.0.103', '127.0.0.1', '10.139.63.161', '10.139.62.88',
-    #                      'localhost']  # 2 server IP's to be added here
-    #   # self.portlist = [i for i in xrange(, 7744)]
-    #   self.serverPort = [i for i in xrange(50000, 50009)]
-    #   for port in xrange(start, start+tries-1):
-    #     if bind_to_port(self.socket, port):
-    #       break
-    #
-    #   connectFlag = False
-    #   for s in self.serverList:
-    #     print s, port
-    #     try:
-    #       self.socket.connect((s, port))
-    #       connectFlag = True
-    #       print "Connect success"
-    #       break
-    #     except error:
-    #       print "No luck there."
-    #
-    #   if connectFlag is False:
-    #     sys.exit('Connection Error. Please try again later')
-    # else:
-    print ip, self.pport, sport
-    self.socket.bind(('', self.pport))
-    self.socket.connect((ip, sport))
+    if sport is None or ip is None:
+      iplist = ['0.0.0.0', '192.168.0.100', '192.168.0.106', '192.168.0.103',
+                '127.0.0.1', '10.139.63.161', '10.139.62.88', 'localhost']  # 2 server IP's to be added here
+      portlist = [i for i in xrange(start, start+tries-1)]
+      for ip in iplist:
+        for port in portlist:
+          try:
+            print ip, port
+            self.socket.connect((ip, port))
+            return
+          except error:
+            self.socket.close()
+            self.socket = socket(AF_INET, SOCK_STREAM)
+      sys.exit('Cannot connect to server')
+    else:
+      self.socket.connect((ip, sport))
 
   def check_file(self, filename):
     """
@@ -65,6 +51,10 @@ class Client(object):
       msg = client_recv(self.socket)
       if msg[0].lower() in ['exit', 'quit']:
         print "Thank You for using our chatroom. Press enter to continue."
+        self.suspended = True
+      elif msg[0].lower() in ['kill']:
+        print "Server has suspended operation. Thank You for using our chatroom. Press enter to continue."
+        client_send(self.socket, '@server|exit')
         self.suspended = True
       elif len(msg) > 1:
         if msg[1].lower() in ['whohas']:
@@ -94,9 +84,9 @@ class Client(object):
         empty_tuple = ()
         udpclient = UDPClient(self, input, s, cp)
         thread.start_new_thread(udpclient.execute, empty_tuple)
+    self.socket.close()
 
 
-print int(sys.argv[2]), sys.argv[1]
-c1 = Client(int(sys.argv[2]), sys.argv[1]);
+ip, port = (sys.argv[1], int(sys.argv[2])) if len(sys.argv) > 2 else (None, None)
+c1 = Client(ip, port)
 c1.execute()
-

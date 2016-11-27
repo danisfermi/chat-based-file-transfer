@@ -39,9 +39,11 @@ class ClientNode(object):
       send_data(self.socket, msg)
     while not self.suspended:
       self.accept_message()
-    send_data(self.socket, 'exit')
-    self.chatroom.remove_client(self.username)
-    self.server.remove_client(self.username)
+    if not self.server.suspended:
+      send_data(self.socket, 'exit')
+      self.chatroom.broadcast('INFO| User ' + self.username + ' has left\n', self.username)
+      self.chatroom.remove_client(self.username)
+      self.server.remove_client(self.username)
     self.socket.close()
 
   def accept_login(self):

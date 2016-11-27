@@ -10,7 +10,9 @@ logging.basicConfig(filename='server.log', level=logging.DEBUG)
 
 
 class Server(object):
-
+  """
+  Class object that stores all server related info.
+  """
   def __init__(self):
     """
     self.clients is a list of all client objects instantiated by the server.
@@ -22,6 +24,7 @@ class Server(object):
     self.ip = gethostbyname(gethostname())
     self.clients = {}
     self.chatrooms = {}
+    self.suspended = False
 
   def remove_client(self, username):
     """
@@ -58,19 +61,61 @@ class Server(object):
     print 'Server is listening at', listen_port
     self.port = listen_port
 
+  def broadcast(self, msg):
+    """
+    Send a message to all clients connected to server
+    """
+    for client in self.clients.values():
+      send_data(client.socket, msg)
+
+  def get_user_input(self):
+    """
+    TODO Parse user input on server and take action
+    """
+    while not self.suspended:
+      input = raw_input()
+      input = input.split('|')
+      if input[0] in ['exit', 'quit', 'kill']:
+        self.broadcast('kill')
+        self.suspended = True
+        for client in self.clients.values():
+          client.socket.close()
+        self.s.close()  # Have to connect to socket to exit server.
+        sock = socket(AF_INET, SOCK_STREAM)
+        port = bind_to_random(sock)
+        sock.connect((str(self.ip), self.port))
+      elif len(input) > 1:
+        msg = '|'.join(['#server']+input[1:])
+        if input[0][:1] == '@':
+          destination = input[0][1:].lower()
+          if destination == 'server':
+            print msg
+          elif destination == 'all':
+            self.broadcast(msg)
+          else:
+            client = self.clients.get(destination, None)
+            if client:
+              client_send(client.socket, msg)
+            else:
+              print 'Destination not active'
+        else:
+          print msg
+
   def execute(self):
     """
     This is the main server thread. Go online and start listening for connections.
     Accept client connections and start a new client thread using its execute method.
     """
     self.go_online()
-    while True:
+    empty_tuple = ()
+    thread.start_new_thread(self.get_user_input, empty_tuple)
+    while not self.suspended:
       ds, addr = self.s.accept()
       client = ClientNode(self, addr, ds)
       # self.clients.append(client)  # Now happens after username is verified in clientNode.py
       print 'Incoming connection from', addr
-      empty_tuple = ()
-      thread.start_new_thread(client.execute, empty_tuple)
+      if not self.suspended:
+        thread.start_new_thread(client.execute, empty_tuple)
 
 
 s1 = Server()
