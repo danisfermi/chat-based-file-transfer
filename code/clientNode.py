@@ -13,19 +13,17 @@ class ClientNode(object):
   Class object for holding client related information
   """
 
-  def __init__(self, server_reference, ip, socket, client_id):
+  def __init__(self, server_reference, ip, socket):
     """
 
     :param ip: IP address of client.
     :param socket: Socket at server used to communicate with client.
-    :param client_id:
     """
     # TODO: Client ID cant be used to index clients array if previous clients have exited.
     # TODO: User cannot exit and relogin with same username if entry not deleted.
     self.server = server_reference
     self.ip = ip
     self.socket = socket
-    self.client_id = client_id
     self.username = None
     self.suspended = False
     self.chatroom = None
@@ -44,8 +42,8 @@ class ClientNode(object):
       send_data(self.socket, msg)
     while not self.suspended:
       self.accept_message()
-    self.chatroom.clients.remove(self.username)
     send_data(self.socket, 'exit')
+    self.chatroom.remove_client(self.username)
     self.server.remove_client(self.username)
     self.socket.close()
 
@@ -63,8 +61,7 @@ class ClientNode(object):
     logging.info('Check_username')
     msg = decode_data(recv_data(self.socket))
     name = msg[0]
-    usernames = [i for i in list(self.server.clients)]
-    if name in usernames + ['server', 'all']:  # 'all', 'server' not valid usernames
+    if name in list(self.server.clients) + ['server', 'all', 'root']:  # 'all', 'server' , 'root' not valid usernames
       if tries > 0:
         send_err(self.socket, 'Username taken, kindly choose another.\n')
         self.check_username(tries - 1)
@@ -73,7 +70,7 @@ class ClientNode(object):
         self.suspended = True
     else:
       self.username = name
-      self.server.clients[self.username] = self
+      self.server.clients[self.username] = self  # Add to dictionary in server.
       send_ok(self.socket, 'Username ' + name + ' accepted. Send create/join a chatroom\n')
     return
 
@@ -118,7 +115,7 @@ class ClientNode(object):
     if self.suspended:
       return
     msg = decode_data(recv_data(self.socket))
-    name, names = msg[0], [i.name for i in self.server.chatrooms]
+    name, names = msg[0], list(self.server.chatrooms)
     if name in names:
       if tries > 0:
         send_err(self.socket, 'Sorry, chatroom already taken. Please try again.\n')
@@ -128,7 +125,7 @@ class ClientNode(object):
         self.suspended = True
     else:
       new_room = ChatRoom(self.server, name, self.username)
-      self.server.chatrooms.append(new_room)
+      self.server.chatrooms[name] = new_room
       self.chatroom = new_room
       send_ok(self.socket, 'Chatroom ' + name + ' created.\n')
 
@@ -142,8 +139,9 @@ class ClientNode(object):
       return
     msg = decode_data(recv_data(self.socket))
     name = msg[0]
-    for room in self.server.chatrooms:
-      if name == room.name:
+    for room_name in list(self.server.chatrooms):
+      room = self.server.chatrooms[room_name]
+      if name == room_name:
         room.broadcast('INFO| New user ' + self.username + ' has joined\n', self.username)
         send_ok(self.socket, 'You have joined chatroom - ' + name + '\n')
         self.chatroom = room
@@ -167,7 +165,6 @@ class ClientNode(object):
     broadcast if destination is 'all'. Edit message to include source instead of destination
     Messages with destination as 'server' may be an exit or quit message.
     """
-    # TODO
     msg = decode_data(recv_data(self.socket))
     destination = msg[0]
     if destination[:1] != '@':

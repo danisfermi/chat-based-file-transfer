@@ -21,9 +21,7 @@ class Server(object):
     self.port = 0
     self.ip = gethostbyname(gethostname())
     self.clients = {}
-    self.chatrooms = []
-    self.client_count = 0
-    self.room_count = 0
+    self.chatrooms = {}
 
   # Server class functions follow
 
@@ -34,10 +32,10 @@ class Server(object):
       print 'Client not in server.clients{}'
 
   def get_chatrooms(self):
-    names = []
-    for c in self.chatrooms:
-      names.append(c.name)
-    return names
+    # names = []
+    # for c in self.chatrooms:
+    #   names.append(c.name)
+    return list(self.chatrooms)
 
   def go_online(self, start=50000, tries=10):
     """
@@ -68,9 +66,8 @@ class Server(object):
     self.go_online()
     while True:
       ds, addr = self.s.accept()
-      client = ClientNode(self, addr, ds, self.client_count)
-      self.client_count += 1
-      # self.clients.append(client)
+      client = ClientNode(self, addr, ds)
+      # self.clients.append(client)  # Now happens after username is verified in clientNode.py
       print 'Incoming connection from', addr
       empty_tuple = ()
       thread.start_new_thread(client.execute, empty_tuple)

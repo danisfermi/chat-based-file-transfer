@@ -17,12 +17,17 @@ class ChatRoom(object):
     ChatRoom ID is auto generated from server's room count history.
     :param server_reference: Pointer to server object that instantiated this class
     :param name: Chatroom name
-    :param client_id: ID of client that created the room, to be added to list of clients.
+    :param username: Client that created the room, to be added to list of clients.
     """
     self.server = server_reference
     self.name = name
-    self.id = server_reference.room_count
     self.clients = [username]
+
+  def remove_client(self, username):
+    try:
+      self.clients.remove(username)
+    except ValueError:
+      print 'Client not in chatroom.clients[]'
 
   def get_client(self, username):
     """
@@ -32,7 +37,7 @@ class ChatRoom(object):
     """
     # Do not access server dictionary directly since this would bypass checking chatroom if username is a member.
     for name in self.clients:
-      client = self.server.clients.get(name)
+      client = self.server.clients.get(name, None)
       if client is not None and not client.suspended and name == username:
         return client
     return None
