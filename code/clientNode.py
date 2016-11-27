@@ -44,8 +44,9 @@ class ClientNode(object):
       send_data(self.socket, msg)
     while not self.suspended:
       self.accept_message()
-    self.chatroom.clients.remove(self.client_id)
+    self.chatroom.clients.remove(self.username)
     send_data(self.socket, 'exit')
+    self.server.remove_client(self.username)
     self.socket.close()
 
   def accept_login(self):
@@ -62,7 +63,7 @@ class ClientNode(object):
     logging.info('Check_username')
     msg = decode_data(recv_data(self.socket))
     name = msg[0]
-    usernames = [i.username for i in self.server.clients]
+    usernames = [i for i in list(self.server.clients)]
     if name in usernames + ['server', 'all']:  # 'all', 'server' not valid usernames
       if tries > 0:
         send_err(self.socket, 'Username taken, kindly choose another.\n')
@@ -72,6 +73,7 @@ class ClientNode(object):
         self.suspended = True
     else:
       self.username = name
+      self.server.clients[self.username] = self
       send_ok(self.socket, 'Username ' + name + ' accepted. Send create/join a chatroom\n')
     return
 
@@ -125,7 +127,7 @@ class ClientNode(object):
         send_err(self.socket, 'Max tries reached, closing connection.\n')
         self.suspended = True
     else:
-      new_room = ChatRoom(self.server, name, self.client_id)
+      new_room = ChatRoom(self.server, name, self.username)
       self.server.chatrooms.append(new_room)
       self.chatroom = new_room
       send_ok(self.socket, 'Chatroom ' + name + ' created.\n')
@@ -150,7 +152,7 @@ class ClientNode(object):
           send_list(self.socket, self.chatroom.get_usernames())
         else:
           send_data(self.socket, 'There are no peers in the room:\n')
-        room.clients.append(self.client_id)
+        room.clients.append(self.username)
         return
     if tries > 0:
       send_err(self.socket, 'Sorry, chatroom name not found. Please try again.\n')

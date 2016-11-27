@@ -20,12 +20,18 @@ class Server(object):
     self.s = socket(AF_INET, SOCK_STREAM)
     self.port = 0
     self.ip = gethostbyname(gethostname())
-    self.clients = []
+    self.clients = {}
     self.chatrooms = []
     self.client_count = 0
     self.room_count = 0
 
   # Server class functions follow
+
+  def remove_client(self, username):
+    try:
+      self.clients.pop(username)
+    except KeyError:
+      print 'Client not in server.clients{}'
 
   def get_chatrooms(self):
     names = []
@@ -64,7 +70,7 @@ class Server(object):
       ds, addr = self.s.accept()
       client = ClientNode(self, addr, ds, self.client_count)
       self.client_count += 1
-      self.clients.append(client)
+      # self.clients.append(client)
       print 'Incoming connection from', addr
       empty_tuple = ()
       thread.start_new_thread(client.execute, empty_tuple)

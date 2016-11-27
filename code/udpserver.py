@@ -86,7 +86,7 @@ class UDPServer(object):
       msg = f.read(buff)
     self.send_pkt('EOF')
     f.close()
-    print "All close"
+    # print "All close"
 
   def send_pkt(self, send_msg, tries=10):
     """

@@ -83,7 +83,6 @@ class Client(object):
     empty_tuple = ()
     thread.start_new_thread(self.listen_to_server, empty_tuple)
     while not self.suspended:
-      print "Enter input"
       input = raw_input()
       client_send(self.socket, input)
       input = input.rstrip('\n')
@@ -95,7 +94,6 @@ class Client(object):
         empty_tuple = ()
         udpclient = UDPClient(self, input, s, cp)
         thread.start_new_thread(udpclient.execute, empty_tuple)
-    print 'entire client suspended'
 
 
 print int(sys.argv[2]), sys.argv[1]

@@ -12,7 +12,7 @@ class ChatRoom(object):
   Class object for holding chatroom specific info
   """
 
-  def __init__(self, server_reference, name, client_id):
+  def __init__(self, server_reference, name, username):
     """
     ChatRoom ID is auto generated from server's room count history.
     :param server_reference: Pointer to server object that instantiated this class
@@ -22,7 +22,7 @@ class ChatRoom(object):
     self.server = server_reference
     self.name = name
     self.id = server_reference.room_count
-    self.clients = [client_id]
+    self.clients = [username]
 
   def get_client(self, username):
     """
@@ -30,10 +30,10 @@ class ChatRoom(object):
     :param username:
     :return: pointer to the client object if found in chatroom, else - None.
     """
-    #TODO
-    for id in self.clients:
-      client = self.server.clients[id]
-      if not client.suspended and client.username == username:
+    # Do not access server dictionary directly since this would bypass checking chatroom if username is a member.
+    for name in self.clients:
+      client = self.server.clients.get(name)
+      if client is not None and not client.suspended and name == username:
         return client
     return None
 
@@ -41,12 +41,12 @@ class ChatRoom(object):
     """
     Returns a list of all active client usernames in chatroom
     """
-    client_list = []
-    for id in self.clients:
-      client = self.server.clients[id]
-      if not client.suspended:
-        client_list.append(client.username)
-    return client_list
+    # client_list = []
+    # for id in self.clients:
+    #   client = self.server.clients[id]
+    #   if not client.suspended:
+    #     client_list.append(client.username)
+    return self.clients
 
   def broadcast(self, msg, source=None):
     """
@@ -54,31 +54,18 @@ class ChatRoom(object):
     :param msg: Raw message to be sent
     :param source: Add a from source field to message and send to all other clients
     """
-    # TODO: There is something wrong with this function when source is not None.
-    # source_verified = True if source is None else False
-    # if source:
-    #   msg = '#' + source + '|' + msg
-    # for client_id in self.clients:
-    #   clients = self.server.clients
-    #   if source == clients[client_id].username:
-    #     source_verified = True
-    #   else:
-    #     send_data(clients[client_id].socket, msg)
-    # if not source_verified:
-    #   print "Good Lord, why is this error coming?"
-    #   sys.exit('Source client not in chatroom client list')
-
-    # TODO: The following code seems to be working fine,
-    # TODO: but there is a sendall data error triggered by send when lone client tries to broadcast
-    # TODO: This is repeated on any subsequent broadcast, but doesnt come on a unicast.
-    # if self.server.
     if source is None:
-      for client_id in self.clients:
-        clients = self.server.clients
-        send_data(clients[client_id].socket, msg)
+      for name in self.clients:
+        client = self.server.clients.get(name, None)
+        if client:
+          send_data(client.socket, msg)
+        else:
+          print 'Client not present in server.clients{}'
     else:
-      for client_id in self.clients:
-        clients = self.server.clients
-        if source != clients[client_id].username:
-          send_data(clients[client_id].socket, msg)
-
+      for name in self.clients:
+        if source != name:
+          client = self.server.clients.get(name, None)
+          if client:
+            send_data(client.socket, msg)
+          else:
+            print 'Client not present in server.clients{}'

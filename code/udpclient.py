@@ -62,8 +62,8 @@ class UDPClient(object):
       if msg[:3] == 'EOF':
         self.suspended = True
         f.close()
-        print "Client all close"
+        # print "Client all close"
       else:
         f.write(msg)
         # print msg
-    print 'finished'
+    # print 'finished'
