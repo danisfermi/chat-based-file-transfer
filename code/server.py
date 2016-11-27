@@ -26,15 +26,18 @@ class Server(object):
   # Server class functions follow
 
   def remove_client(self, username):
+    """
+    Remove username from dictionary of clients.
+    """
     try:
       self.clients.pop(username)
     except KeyError:
       print 'Client not in server.clients{}'
 
   def get_chatrooms(self):
-    # names = []
-    # for c in self.chatrooms:
-    #   names.append(c.name)
+    """
+    Return a list of chatroom names.
+    """
     return list(self.chatrooms)
 
   def go_online(self, start=50000, tries=10):

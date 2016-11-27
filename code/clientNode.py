@@ -15,12 +15,9 @@ class ClientNode(object):
 
   def __init__(self, server_reference, ip, socket):
     """
-
     :param ip: IP address of client.
     :param socket: Socket at server used to communicate with client.
     """
-    # TODO: Client ID cant be used to index clients array if previous clients have exited.
-    # TODO: User cannot exit and relogin with same username if entry not deleted.
     self.server = server_reference
     self.ip = ip
     self.socket = socket

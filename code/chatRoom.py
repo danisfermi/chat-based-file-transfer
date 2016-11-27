@@ -24,6 +24,9 @@ class ChatRoom(object):
     self.clients = [username]
 
   def remove_client(self, username):
+    """
+    Remove username from list of usernames in chatroom
+    """
     try:
       self.clients.remove(username)
     except ValueError:
