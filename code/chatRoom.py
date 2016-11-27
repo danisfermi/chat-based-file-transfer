@@ -49,11 +49,6 @@ class ChatRoom(object):
     """
     Returns a list of all active client usernames in chatroom
     """
-    # client_list = []
-    # for id in self.clients:
-    #   client = self.server.clients[id]
-    #   if not client.suspended:
-    #     client_list.append(client.username)
     return self.clients
 
   def broadcast(self, msg, source=None):

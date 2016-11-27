@@ -6,6 +6,9 @@ import thread
 
 
 def client_send(s, data):
+  """
+  Try send data to server using socket s.
+  """
   try:
     s.sendall(data)
   except error:
@@ -13,6 +16,9 @@ def client_send(s, data):
 
 
 def client_recv(s):
+  """
+  Receive 4KB data from server and decode and return message after splitting using delimiter '|'
+  """
   try:
     recv = s.recv(4096)
     recv = str(recv)
@@ -28,33 +34,44 @@ def client_recv(s):
 
 
 
-def send_data(socket, data):
-  #TODO
+def send_data(s, data):
+  """
+  Send data to client via socket s
+  """
   try:
-    data_left = socket.send(data)
+    data_left = s.send(data)
   except error:
     print 'send_data error'
 
 
 def send_ok(socket, opt_msg=''):
-  #TODO
+  """
+  Send an OK followed by an optional message to client
+  """
   msg = 'OK|' + opt_msg
   send_data(socket, msg)
 
 
 def send_err(socket, err_msg):
-  #TODO
+  """
+  Send an ERROR followed by a mandatory message to client
+  """
   msg = 'ERROR|' + err_msg
   send_data(socket, msg)
 
 
 def send_list(socket, list):
-  #TODO
+  """
+  Join the list using delimiter '|' and send data to client
+  """
   msg = "|".join(list) + '\n'
   return send_data(socket, msg)
 
 
 def recv_data(s):
+  """
+  Receive up to 4KB data into socket s and return the data
+  """
   try:
     recv_buf = s.recv(4096)
   except error:
@@ -63,6 +80,11 @@ def recv_data(s):
 
 
 def decode_data(recv_buf):
+  """
+  Remove trailing \r\n added and decode message to list
+  :param recv_buf: Buffer of size 4KB
+  :return: Received data split into list delimited by '|'
+  """
   try:
     recv_buf = str(recv_buf.decode())
     if recv_buf[-2:] == '\r\n':
@@ -79,6 +101,11 @@ def decode_data(recv_buf):
 
 
 def bind_to_port(s, port):
+  """
+  :param s: Socket to bind
+  :param port: Port to bind to
+  :return: True on success, False otherwise
+  """
   try:
     s.bind(('', port))
   except error:
@@ -92,7 +119,6 @@ def bind_to_random(s, tries=10, start=40000, stop=50000):
   :param tries:
   :param start:
   :param stop:
-  :return:
   """
   while tries > 0:
     port = random.randint(start, stop-1)
@@ -101,4 +127,3 @@ def bind_to_random(s, tries=10, start=40000, stop=50000):
     print "Couldn't bind to data port. Aborting..."
     sys.exit()
   return port
-

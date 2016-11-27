@@ -172,7 +172,6 @@ class ClientNode(object):
     if destination == 'all':
       self.chatroom.broadcast('|'.join(msg), self.username)
     elif destination == 'server':
-      # TODO: This piece of code may need more features
       if len(msg) > 1:
         if msg[1].lower() in ['exit', 'quit']:
           self.suspended = True

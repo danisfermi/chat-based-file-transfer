@@ -23,8 +23,6 @@ class Server(object):
     self.clients = {}
     self.chatrooms = {}
 
-  # Server class functions follow
-
   def remove_client(self, username):
     """
     Remove username from dictionary of clients.
@@ -58,7 +56,6 @@ class Server(object):
 
     self.s.listen(25)
     print 'Server is listening at', listen_port
-    # data_port = library.bind_to_random(tries)  # bind to a random port for data
     self.port = listen_port
 
   def execute(self):
