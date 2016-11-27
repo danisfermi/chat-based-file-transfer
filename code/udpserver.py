@@ -23,7 +23,22 @@ class UDPServer(object):
 
   def udp_send(self, msg):
     # print self.cip, self.cport
-    self.socket.sendto(msg.encode(), (self.cip, self.cport))
+    # try:
+    #   msg = msg
+    # except TypeError:
+    #   try:
+    #     msg = msg.decode('hex')
+    #   except TypeError:
+    #     try:
+    #       msg = msg.decode('utf-8')
+    #     except UnicodeDecodeError:
+    #       try:
+    #         msg = msg.decode('latin-1')
+    #       except TypeError:
+    #         self.suspended = True
+    #         return
+
+    self.socket.sendto(msg, (self.cip, self.cport))
 
   def udp_recv(self, size=2048):
     msg, saddr = self.socket.recvfrom(size)
@@ -31,7 +46,8 @@ class UDPServer(object):
     msg = str(msg.decode())
     if msg[-1:] == '\n':
       msg = msg[:-1]
-    print msg
+    if msg != 'ACK':
+      print msg
     return msg
 
   def execute(self):
@@ -70,17 +86,19 @@ class UDPServer(object):
       msg = f.read(buff)
     self.send_pkt('EOF')
     f.close()
+    print "All close"
 
-  def send_pkt(self, msg, tries=10):
+  def send_pkt(self, send_msg, tries=10):
     """
     Send msg to socket. Receive an ACK from other side that has format #FROM|(N)ACK
     retry send if NACK, else return.
     """
-    self.udp_send(msg)
+    self.udp_send(send_msg)
     msg = self.udp_recv()
     while len(msg) > 3 and msg[:4] == 'NACK' and tries > 1:
       tries -= 1
-      self.udp_send(msg)
+      self.udp_send(send_msg)
       msg = self.udp_recv()
     if msg[:3] != 'ACK':
+      print "Non ACK non NACK"
       self.suspended = True

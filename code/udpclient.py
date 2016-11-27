@@ -26,10 +26,21 @@ class UDPClient(object):
 
   def udp_recv(self, size=2048):
     msg, saddr = self.socket.recvfrom(size)
-    msg = str(msg.decode())
-    if msg[-1:] == '\n':
-      msg = msg[:-1]
-    print msg
+    # try:
+    #   msg = msg
+    # except TypeError:
+    #   try:
+    #     msg = msg.encode('utf-8')
+    #   except UnicodeDecodeError:
+    #     try:
+    #       msg = msg.encode('latin-1')
+    #     except TypeError:
+    #       self.suspended = True
+    #       return
+    msg = str(msg)
+    # if msg[-1:] == '\n':
+    #   msg = msg[:-1]
+    # print msg
     return msg
 
   def execute(self):
@@ -50,6 +61,9 @@ class UDPClient(object):
       self.udp_send('ACK')
       if msg[:3] == 'EOF':
         self.suspended = True
+        f.close()
+        print "Client all close"
       else:
         f.write(msg)
         # print msg
+    print 'finished'
