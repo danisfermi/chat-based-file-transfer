@@ -22,17 +22,15 @@ class UDPServer(object):
     self.suspended = False
 
   def udp_send(self, msg):
-    print self.cip, self.cport
+    # print self.cip, self.cport
     self.socket.sendto(msg.encode(), (self.cip, self.cport))
 
   def udp_recv(self, size=2048):
     msg, saddr = self.socket.recvfrom(size)
-    print msg, saddr[0], self.cip
-    # assert saddr[0] == self.cip
+    assert saddr[0] == self.cip
     msg = str(msg.decode())
     if msg[-1:] == '\n':
       msg = msg[:-1]
-    msg = msg.split("|")
     print msg
     return msg
 
@@ -55,7 +53,7 @@ class UDPServer(object):
       self.udp_send('ERROR| File Not Found')
       self.suspended = True
 
-    self.udp_send('OK| Sending file on port ' + str(self.cport) + 'from |' + str(self.sip) + '|' + str(self.sport))
+    self.udp_send('OK| Sending file on port ' + str(self.cport) + ' from |' + str(self.sip) + '|' + str(self.sport))
 
   def transfer(self):
     """
@@ -70,7 +68,7 @@ class UDPServer(object):
     while msg != '' and not self.suspended:
       self.send_pkt(msg)
       msg = f.read(buff)
-    self.udp_send('EOF')
+    self.send_pkt('EOF')
     f.close()
 
   def send_pkt(self, msg, tries=10):
@@ -79,10 +77,10 @@ class UDPServer(object):
     retry send if NACK, else return.
     """
     self.udp_send(msg)
-    msg_list = self.udp_recv()
-    while msg_list[1] == 'NACK' and tries > 1:
+    msg = self.udp_recv()
+    while len(msg) > 3 and msg[:4] == 'NACK' and tries > 1:
       tries -= 1
       self.udp_send(msg)
-      msg_list = self.udp_recv()
-    if msg_list[1] != 'ACK':
+      msg = self.udp_recv()
+    if msg[:3] != 'ACK':
       self.suspended = True
