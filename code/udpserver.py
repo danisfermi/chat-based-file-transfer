@@ -14,38 +14,29 @@ class UDPServer(object):
 
   def __init__(self, parent, msg):
     self.parent = parent
-    self.udp_server_name = msg[0][1:]
+    self.udp_client_name = msg[0][1:]
     self.socket = socket(AF_INET, SOCK_DGRAM)
-    self.sip, self.sport = '', 0
-    self.cport = bind_to_random(self.socket)
-    if len(msg) < 3:
-      client_send(self.parent.socket, '@' + self.udp_server_name + 'ERROR| Please specify filename')
-      self.suspended = True
-    else:
-      self.filename = msg[2]
-      self.suspended = not self.check_file(self.filename)
+    self.cip, self.cport = msg[3], int(msg[4])
+    self.sip, self.sport = self.parent.ip, bind_to_random(self.socket)
+    self.filename = msg[2]
+    self.suspended = False
 
   def udp_send(self, msg):
-    self.socket.sendto(msg.encode(), (self.sip, self.sport))
+    print self.cip, self.cport
+    self.socket.sendto(msg.encode(), (self.cip, self.cport))
 
   def udp_recv(self, size=2048):
     msg, saddr = self.socket.recvfrom(size)
-    assert saddr == self.sip
-    msg = msg.decode()
+    print msg, saddr[0], self.cip
+    # assert saddr[0] == self.cip
+    msg = str(msg.decode())
+    if msg[-1:] == '\n':
+      msg = msg[:-1]
+    msg = msg.split("|")
     print msg
     return msg
 
-  def check_file(self):
-    """
-    iterate over file-folder and check if the filename is available. Else: send an error message.
-    """
-    for file in os.listdir('Folder'):
-      if fnmatch.fnmatch(file, self.filename):
-        return True
-    client_send(self.parent.socket, '@' + self.udp_server_name + 'ERROR| File Not Found')
-    return False
-
-  def execute(self, msg):
+  def execute(self):
     """
     Comes here when a file is requested.
     Msg from UDPServer is in format: #FROM|getfile|filename|udpserver_IP|udpserver_port
@@ -60,12 +51,11 @@ class UDPServer(object):
     """
     if self.suspended:
       return
-    msg = client_recv(self.parent.socket)
-    try:
-      self.sip, self.sport = msg[1], int(msg[2])
-    except ValueError:
+    if not self.parent.check_file(self.filename):
+      self.udp_send('ERROR| File Not Found')
       self.suspended = True
-    client_send(self.parent.socket, 'OK| Sending file on port ' + self.sport + '. Send (N)ACKs to |' + self.cport)
+
+    self.udp_send('OK| Sending file on port ' + str(self.cport) + 'from |' + str(self.sip) + '|' + str(self.sport))
 
   def transfer(self):
     """
@@ -75,11 +65,12 @@ class UDPServer(object):
     if self.suspended:
       return
     buff = 2048
-    f = open(self.filename)
+    f = open('folder/' + self.filename)
     msg = f.read(buff)
     while msg != '' and not self.suspended:
-      send_pkt(msg)
+      self.send_pkt(msg)
       msg = f.read(buff)
+    self.udp_send('EOF')
     f.close()
 
   def send_pkt(self, msg, tries=10):

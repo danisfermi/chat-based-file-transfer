@@ -7,7 +7,7 @@ import thread
 
 def client_send(s, data):
   try:
-    s.sendall(data.encode())
+    s.sendall(data)
   except error:
     print 'sendall data error'
 
@@ -15,7 +15,7 @@ def client_send(s, data):
 def client_recv(s):
   try:
     recv = s.recv(4096)
-    recv = str(recv.decode())
+    recv = str(recv)
   except UnicodeDecodeError:
     print 'Unexpected byte stream in received data'
   except error:
@@ -31,9 +31,9 @@ def client_recv(s):
 def send_data(socket, data):
   #TODO
   try:
-    data_left = socket.send(data.encode())
+    data_left = socket.send(data)
   except error:
-    print 'sendall data error' + data_left
+    print 'send_data error'
 
 
 def send_ok(socket, opt_msg=''):
@@ -69,9 +69,7 @@ def decode_data(recv_buf):
       recv_buf = recv_buf[:-2]
     elif recv_buf[-1:] == '\n':
       recv_buf = recv_buf[:-1]
-    # recv_buf = recv_buf.replace('\r', '')  # Remove \r at the end of each message
     print recv_buf
-    # recv_buf = recv_buf.replace('\n', '')  # Remove \n at the end of each message
   except UnicodeDecodeError:
     print 'Unexpected byte stream in received data'
     #TODO make sure the server does not exit.

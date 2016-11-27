@@ -1,7 +1,7 @@
 #! /usr/bin/python
 from library import *
-from UDPClient import *
-from UDPServer import *
+from udpclient import *
+from udpserver import *
 import fnmatch
 import os
 import random
@@ -22,7 +22,7 @@ class Client(object):
     self.socket = socket(AF_INET, SOCK_STREAM)
     self.suspended = False
     self.pport = random.randrange(23456, 24567)
-    self.ip = gethostbyaddr(gethostname())
+    self.ip = gethostbyname(gethostname())
 
     # if port is None or ip is None:
     #   self.serverList = ['0.0.0.0', '192.168.0.100', '192.168.0.103', '127.0.0.1', '10.139.63.161', '10.139.62.88',
@@ -51,6 +51,15 @@ class Client(object):
     self.socket.bind(('', self.pport))
     self.socket.connect((ip, sport))
 
+  def check_file(self, filename):
+    """
+    iterate over file-folder and check if the filename is available. Else: send an error message.
+    """
+    for file in os.listdir('folder'):
+      if fnmatch.fnmatch(file, filename):
+        return True
+    return False
+
   def listen_to_server(self):
     while not self.suspended:
       msg = client_recv(self.socket)
@@ -60,12 +69,15 @@ class Client(object):
       elif len(msg) > 1:
         if msg[1].lower() in ['whohas']:
           if self.check_file(msg[2]):
-            send_msg = '@' + msg[0][1:] + '|ME'
-            client_send(self.socket, send_msg)
+            client_send(self.socket, '@' + msg[0][1:] + '|ME')
         elif msg[1].lower() in ['getfile']:
-          empty_tuple = ()
-          udpserver = UDPServer(self, msg)
-          thread.start_new_thread(udpserver.execute, empty_tuple)
+          if len(msg) < 3:
+            client_send(self.socket, '@' + msg[0][1:] + '|ERROR: Please specify filename')
+          else:
+            empty_tuple = ()
+            msg += client_recv(self.socket)[1:]  # add cip and cport sent from client
+            udpserver = UDPServer(self, msg)
+            thread.start_new_thread(udpserver.execute, empty_tuple)
 
   def execute(self):
     empty_tuple = ()
@@ -75,9 +87,12 @@ class Client(object):
       client_send(self.socket, input)
       input = input.rstrip('\n')
       input = input.split("|")
-      if len(input) > 1 and input[1] == 'getfile':
+      if len(input) > 2 and input[1] == 'getfile':
+        s = socket(AF_INET, SOCK_DGRAM)
+        cp = bind_to_random(s)
+        client_send(self.socket, '|'.join([input[0], str(self.ip), str(cp)]))
         empty_tuple = ()
-        udpclient = UDPClient(self, input)
+        udpclient = UDPClient(self, input, s, cp)
         thread.start_new_thread(udpclient.execute, empty_tuple)
 
 
