@@ -4,7 +4,7 @@ from library import *
 from socket import *
 from chatRoom import *
 import logging
-
+MAX_SIZE = 16
 logging.basicConfig(filename='server.log', level=logging.DEBUG)
 
 
@@ -56,14 +56,27 @@ class UDPClient(object):
     else:
       return
     f = open('folder/' + self.filename + '1', 'w')
+    self.seqNo =0
     while not self.suspended:
       msg = self.udp_recv()
-      self.udp_send('ACK')
+      #self.udp_send('ACK')
       if msg[:3] == 'EOF':
         self.suspended = True
         f.close()
         # print "Client all close"
       else:
-        f.write(msg)
+        msg = msg.split("|")
+        #print " client  fddf df df %s %s" %(msg[1],self.seqNo)
+        if msg[0]== str(self.seqNo) :
+          #print " client ack"
+          self.udp_send('ACK')
+          f.write(msg[1])
+          self.seqNo += 1
+          self.seqNo %= MAX_SIZE
+        else :
+          self.udp_send('NACK')
+          #print " client ********** NACK"
+          self.suspended = True
+          f.close()
         # print msg
     # print 'finished'
