@@ -24,6 +24,7 @@ class UDPServer(object):
     self.lock = threading.Lock()
     self.readyToSend = 1
     self.send_msg = ''
+    self.buffered_msgs = []
 
   def udp_send(self, msg):
     # print self.cip, self.cport
@@ -80,40 +81,87 @@ class UDPServer(object):
     self.window = MAX_SIZE
     self.seqNo = 0
     f = open('folder/' + self.filename)
-    self.send_msg = f.read(buff-4) # 4 bytes for seq no
-#    print "msg***   %s" %self.send_msg
-    while self.send_msg != '' and not self.suspended:
+    self.send_msg = f.read(buff-10) # 4 bytes for seq no
+#   print "msg***   %s" %self.send_msg
+    prev_msg = self.send_msg
+    while self.send_msg != ''and not self.suspended:
+      self.lock.acquire()
       if self.window>0:
-        self.send_msg = str(self.seqNo)+'|'+self.send_msg
-        self.udp_send(self.send_msg)
-        self.send_msg = f.read(buff-4) # 4 bytes for seq no
-        self.seqNo +=1
-        self.seqNo %=MAX_SIZE
- #       print "msg***   %s" %self.send_msg
-  #      print "bef %s" %self.window
-        self.lock.acquire()
-   #     print "send %s" %self.window
-        self.window -=1
-        self.lock.release()
+          self.send_msg = str(self.seqNo)+'|*)'+self.send_msg
+          print "send %s" %self.seqNo
+          #print "msg***   %s" %self.send_msg
+          self.buffered_msgs.append([self.seqNo,self.send_msg]) #store the msg in a dict for reTx
+          self.udp_send(self.send_msg)
+          prev_msg = self.send_msg
+          self.send_msg = f.read(buff-10) # 4 bytes for seq no
+          self.seqNo +=1  
+          self.seqNo %=MAX_SIZE
+          #print "send %s" %self.window
+          self.window -=1
+          #print "send release %s" %self.windo
+      self.lock.release()
+    print "send EOF %d %s" %(self.suspended,prev_msg)
     self.udp_send('EOF')
+    self.buffered_msgs.append([self.seqNo,'EOF'])
     f.close()
     
-  def rec_ack(self,tries=10):
-    msg = self.udp_recv()
-    while len(msg) > 3 and msg[:4] == 'NACK' and tries > 1:
-      tries -= 1
-      self.udp_send(self.send_msg)
-      msg = self.udp_recv()
-    if msg[:3] != 'ACK':
-      print "Non ACK non NACK"
-      self.suspended = True
+  def get_index(self,ack_no):
+      count = 0
+      if self.buffered_msgs[0][0]>ack_no: #dup ack
+        return -1
+      for i in self.buffered_msgs:
+        if i[0]== ack_no:
+          self.buffered_msgs.remove(i)
+          self.window += 1
+          return count
+        else:
+          self.buffered_msgs.remove(i)
+          self.window += 1
+        count +=1
+      return -1  
     
-    print "bef rec %s" %self.window
-    self.lock.acquire()
-    print "rec %s" %self.window
-    self.window += 1
-    self.lock.release()
+  def rec_ack(self,tries=10):
+    while not self.suspended:
+      #print "msg wait rec %s"
+      msg = self.udp_recv()
+      msg = msg.split('|')
+      #print "msg received seq no %s" %msg[0]
+      while len(msg[1]) > 3 and msg[1][:4] == 'NACK' and tries > 1:
+        tries -= 1
+        self.udp_send(self.send_msg)
+        msg = self.udp_recv()
+        msg = msg.split('|')
+      if msg[1][:3] != 'ACK': 
+        print "Non ACK non NACK"
+        self.suspended = True
+      
+      #print "bef rec %s" %self.window
+      if msg[1][:3]=='ACK':
+        self.lock.acquire()
+        
+        print "rec %s" %self.window
+        index = self.get_index(int(msg[0]))
+        if index == -1:#dup msg
+          self.suspended = True
+          print "duplicate ack %s" %msg[0]
+          self.udp_send("STA")
+          while self.buffered_msgs:
+             self.udp_send(self.buffered_msgs[0][1])
+             print "duplicate send %s" %self.buffered_msgs[0][0]
+             msg = self.udp_recv()
+             msg = msg.split('|')
+             print "duplicate rec ack %s" %msg[0]
+             if msg[1][:3]=='ACK' and msg[0] == str(self.buffered_msgs[0][0]):
+               self.buffered_msgs.pop(0)
+               self.window+=1
+             elif msg[:3]=='EOF':
+                break;
+        self.udp_send("END")
+        self.suspended = False
+        self.lock.release()
+        print "rec release %s" %self.window
   
+    
   def transfer(self):
     """
     Transfer the filename in our folder/filename to the server.
@@ -125,7 +173,7 @@ class UDPServer(object):
     thread.start_new_thread(self.send_file, empty_tuple)
     print "created a thread"
     thread.start_new_thread(self.rec_ack, empty_tuple)
-    
+      
     ##old code
     #buff = 2048
     #f = open('folder/' + self.filename)

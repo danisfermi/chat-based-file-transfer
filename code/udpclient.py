@@ -4,6 +4,7 @@ from library import *
 from socket import *
 from chatRoom import *
 import logging
+import random
 MAX_SIZE = 16
 logging.basicConfig(filename='server.log', level=logging.DEBUG)
 
@@ -57,26 +58,47 @@ class UDPClient(object):
       return
     f = open('folder/' + self.filename + '1', 'w')
     self.seqNo =0
+    self.count = 0
+    neg_ack = 0
     while not self.suspended:
       msg = self.udp_recv()
       #self.udp_send('ACK')
       if msg[:3] == 'EOF':
         self.suspended = True
         f.close()
-        # print "Client all close"
+        print "Client all close"
+      if msg[:3] == 'END':
+        neg_ack = 0
       else:
-        msg = msg.split("|")
-        #print " client  fddf df df %s %s" %(msg[1],self.seqNo)
-        if msg[0]== str(self.seqNo) :
-          #print " client ack"
-          self.udp_send('ACK')
+        msg = msg.split("|*)")
+        self.count = random.randint(1,100)
+        print "hshshsh client  msg seq no and expected seq no %s %s" %(msg[0],self.seqNo)
+        
+        if self.count==3 and not neg_ack:
+          self.count+=1
+          self.udp_send(str(self.seqNo-1)+'|ACK')
+          print " client ********** NACK"
+          neg_ack = 1
+          msg = self.udp_recv()
+          while msg[:3] != 'STA':
+            print " ********client  msg seq no and expected seq no %s %s" %(msg[0],self.seqNo)
+            msg = self.udp_recv()
+          continue
+        elif msg[0]== str(self.seqNo):
+          self.count+=1
+          print " client ack %d" %self.count
+          ack = msg[0]+'|'+'ACK'
+          if(random.randint(1,1000)>500):
+            self.udp_send(ack)
           f.write(msg[1])
+          #print "msg %s" %msg[1]
+          print " client  msg seq no and expected seq no %s %s" %(msg[0],self.seqNo)
           self.seqNo += 1
           self.seqNo %= MAX_SIZE
-        else :
-          self.udp_send('NACK')
-          #print " client ********** NACK"
-          self.suspended = True
-          f.close()
+        else:
+          self.udp_send(str(self.seqNo-1)+'|ACK')
+          
+          #self.suspended = True
+          #f.close()
         # print msg
     # print 'finished'
