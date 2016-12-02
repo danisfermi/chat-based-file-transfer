@@ -76,5 +76,5 @@ class UDPClient(object):
         # print "Client all close"
       else:
         f.write(msg)
-        # print msg
+        print msg
     # print 'finished'
