@@ -170,7 +170,7 @@ class ClientNode(object):
       send_err(self.socket, 'Sorry, first field in message should be @<destination>\n')
       return
     destination = destination[1:]
-    msg[0] = '#' + self.username
+    msg[0] = '#me' if destination == self.username else '#' + self.username
     if destination == 'all':
       self.chatroom.broadcast('|'.join(msg), self.username)
     elif destination == 'server':
