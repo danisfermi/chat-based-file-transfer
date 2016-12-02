@@ -6,6 +6,7 @@ import fnmatch
 import os
 import random
 import getopt
+import threading
 
 
 class Client(object):
@@ -26,6 +27,9 @@ class Client(object):
     self.ip = gethostbyname(gethostname())
     self.file_share = dict()
     # self.get_args()
+    self.max_conn_semaphore = threading.Semaphore(self.max_share_count)
+    self.conn_left = self.max_share_count
+    self.max_conn_lock = threading.Lock()
     for filename in os.listdir('folder'):
       self.file_share[filename] = True
 
@@ -85,7 +89,7 @@ class Client(object):
     else:
       self.file_share[filename] = boolean
       enabled = 'enabled' if boolean else 'disabled'
-      print 'Sharing ' + enabled + 'on file ' + filename
+      print 'Sharing ' + enabled + ' on file ' + filename
 
   def check_file(self, filename):
     """
@@ -95,6 +99,7 @@ class Client(object):
     for file in os.listdir('folder'):
       if fnmatch.fnmatch(file, filename):
         share = self.file_share.get(filename, None)
+        print 'share: ', share
         if share is None:
           self.file_share[filename] = True
           share = True
@@ -112,17 +117,22 @@ class Client(object):
         client_send(self.socket, '@server|exit')
         self.suspended = True
       elif len(msg) > 1:
+        if msg[1].lower() in ['whohas', 'getfile', 'setshare', 'clrshare'] and len(msg) < 3:
+          client_send(self.socket, '@' + msg[0][1:] + '|ERROR: Please specify filename')
+          continue
+
         if msg[1].lower() in ['whohas']:
           if self.check_file(msg[2]):
             client_send(self.socket, '@' + msg[0][1:] + '|ME')
         elif msg[1].lower() in ['getfile']:
-          if len(msg) < 3:
-            client_send(self.socket, '@' + msg[0][1:] + '|ERROR: Please specify filename')
-          else:
-            empty_tuple = ()
-            msg += client_recv(self.socket)[1:]  # add cip and cport sent from client
-            udpserver = UDPServer(self, msg)
-            thread.start_new_thread(udpserver.execute, empty_tuple)
+          msg += client_recv(self.socket)[1:]  # add cip and cport sent from client
+
+          # message = '@' + msg[0][1:] + '|OK: Send IP and Port details'
+          # socket.sendto(message, (cip, cport))  # Dont send this, else client wont get file not found error.
+
+          udpserver = UDPServer(self, msg)
+          empty_tuple = ()
+          thread.start_new_thread(udpserver.execute, empty_tuple)
         elif msg[0].lower() == '#me':
           instr = msg[1].lower()
           if instr == 'setshare' and len(msg) > 2:
@@ -143,6 +153,7 @@ class Client(object):
       input = input.rstrip('\n')
       input = input.split("|")
       if len(input) > 2 and input[1] == 'getfile':
+
         s = socket(AF_INET, SOCK_DGRAM)
         cp = bind_to_random(s)
         client_send(self.socket, '|'.join([input[0], str(self.ip), str(cp)]))

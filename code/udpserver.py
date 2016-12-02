@@ -13,13 +13,25 @@ class UDPServer(object):
   """
 
   def __init__(self, parent, msg):
+    udp_client_name = msg[0][1:]
+    sock = socket(AF_INET, SOCK_DGRAM)
+    filename, cip, cport = msg[2], msg[3], int(msg[4])
     self.parent = parent
-    self.udp_client_name = msg[0][1:]
-    self.socket = socket(AF_INET, SOCK_DGRAM)
-    self.cip, self.cport = msg[3], int(msg[4])
+    self.udp_client_name = udp_client_name
+    self.socket = sock
+    self.cip, self.cport = cip, cport
     self.sip, self.sport = self.parent.ip, bind_to_random(self.socket)
-    self.filename = msg[2]
+    self.filename = filename
     self.suspended = False
+
+    if not self.parent.conn_left:
+      message = '@' + msg[0][1:] + '|ERROR: Max file share connections reached. Please try later'
+      self.udp_send(message)
+      self.suspended = True
+    else:
+      self.parent.max_conn_lock.acquire()
+      self.parent.conn_left -= 1
+      self.parent.max_conn_lock.release()
 
   def udp_send(self, msg):
     # print self.cip, self.cport
@@ -57,6 +69,9 @@ class UDPServer(object):
     """
     self.connect()
     self.transfer()
+    self.parent.max_conn_lock.acquire()
+    self.parent.conn_left += 1
+    self.parent.max_conn_lock.release()
 
   def connect(self):
     """

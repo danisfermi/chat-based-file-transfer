@@ -4,6 +4,7 @@ from library import *
 from socket import *
 from chatRoom import *
 import logging
+import os
 
 logging.basicConfig(filename='server.log', level=logging.DEBUG)
 
@@ -43,25 +44,35 @@ class UDPClient(object):
     # print msg
     return msg
 
+  def write_filename(self, filename):
+    if self.parent.check_file(filename):
+      return self.write_filename('1' + filename)
+    else:
+      return filename
+
   def execute(self):
     msg = self.udp_recv()
-    if msg[:5] == 'ERROR':  # File not found on peer
+    if msg[:5] == 'ERROR':  # Peer rejects connection or File not found on peer
+      print msg
       self.suspended = True
       return
     elif msg[:2] == 'OK':  # Save peer ip and port details, bind a port and send that
+      print msg
       msg = msg.split("|")
       self.sip = msg[2]
       self.sport = int(msg[3])
       print self.sip, self.sport
     else:
       return
-    f = open('folder/' + self.filename + '1', 'w')
+    new_name = self.write_filename(self.filename)
+    f = open('folder/' + new_name, 'w')
     while not self.suspended:
       msg = self.udp_recv()
       self.udp_send('ACK')
       if msg[:3] == 'EOF':
-        self.suspended = True
         f.close()
+        os.rename('folder/' + new_name, 'folder' + self.filename)
+        self.suspended = True
         # print "Client all close"
       else:
         f.write(msg)

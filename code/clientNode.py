@@ -60,7 +60,7 @@ class ClientNode(object):
     logging.info('Check_username')
     msg = decode_data(recv_data(self.socket))
     name = msg[0]
-    if name in list(self.server.clients) + ['server', 'all', 'root']:  # 'all', 'server' , 'root' not valid usernames
+    if name in list(self.server.clients) + ['server', 'all', 'root', 'me']:  # invalid usernames
       if tries > 0:
         send_err(self.socket, 'Username taken, kindly choose another.\n')
         self.check_username(tries - 1)
