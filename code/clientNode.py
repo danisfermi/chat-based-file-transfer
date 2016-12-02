@@ -220,7 +220,10 @@ class ClientNode(object):
         elif msg[1].lower() == 'get_rooms':
           send_list(self.socket, self.server.get_chatrooms())
         elif msg[1].lower() == 'get_passwd':
-          send_data(self.socket, self.chatroom.get_password())
+          message = self.chatroom.get_password()
+          if message is None:
+            message = 'This chatroom is public and has no password protection.'
+          send_data(self.socket, message)
         else:  # Just deliver the message to server console
           print '|'.join(msg)
     else:
