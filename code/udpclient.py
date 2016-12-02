@@ -21,6 +21,8 @@ class UDPClient(object):
     self.cip, self.cport = self.parent.ip, cp
     self.filename = msg[2]
     self.suspended = False
+    self.buffered_msgs = []
+    self.prev_ack = -1
 
   def udp_send(self, msg):
     self.socket.sendto(msg.encode(), (self.sip, self.sport))
@@ -65,38 +67,52 @@ class UDPClient(object):
       #self.udp_send('ACK')
       if msg[:3] == 'EOF':
         self.suspended = True
+        for i in self.buffered_msgs:
+           f.write(i)
         f.close()
         print "Client all close"
-      if msg[:3] == 'END':
+      elif msg[:3] == 'END':
         neg_ack = 0
       else:
         msg = msg.split("|*)")
         self.count = random.randint(1,100)
-        print "hshshsh client  msg seq no and expected seq no %s %s" %(msg[0],self.seqNo)
+        #print "hshshsh client  msg seq no and expected seq no %s %s" %(msg[0],self.seqNo)
         
         if self.count==3 and not neg_ack:
-          self.count+=1
-          self.udp_send(str(self.seqNo-1)+'|ACK')
-          print " client ********** NACK"
+          self.udp_send(str(self.prev_ack)+'|ACK')
+          #print " NACK client ack %d" %self.prev_ack
+          self.buffered_msgs = []
+          #print " client ********** NACK"
           neg_ack = 1
           msg = self.udp_recv()
           while msg[:3] != 'STA':
-            print " ********client  msg seq no and expected seq no %s %s" %(msg[0],self.seqNo)
+            #print " ********client  msg seq no and expected seq no %s %s" %(msg[0],self.seqNo)
             msg = self.udp_recv()
+          self.seqNo = self.prev_ack+1
+          self.seqNo %= MAX_SIZE
           continue
         elif msg[0]== str(self.seqNo):
-          self.count+=1
-          print " client ack %d" %self.count
           ack = msg[0]+'|'+'ACK'
-          if(random.randint(1,1000)>500):
+          if random.randint(1,1000)>500 or self.seqNo ==MAX_SIZE-1 or neg_ack:
             self.udp_send(ack)
-          f.write(msg[1])
+            #print " client ack %s" %msg[0]
+            self.prev_ack = (self.seqNo+1)%MAX_SIZE -1
+            #write all the pending msgs
+            for i in self.buffered_msgs:
+              f.write(i)
+            self.buffered_msgs = []
+            f.write(msg[1])
+          else:
+            self.buffered_msgs.append(msg[1])
+            
           #print "msg %s" %msg[1]
-          print " client  msg seq no and expected seq no %s %s" %(msg[0],self.seqNo)
+          #print " client  msg seq no and expected seq no %s %s" %(msg[0],self.seqNo)
           self.seqNo += 1
           self.seqNo %= MAX_SIZE
         else:
-          self.udp_send(str(self.seqNo-1)+'|ACK')
+          #print "GBN ERRORRRRRRRRRRRRR"
+          self.udp_send(str(self.prev_ack)+'|ACK')
+          #print " client ack %d" %self.prev_ack
           
           #self.suspended = True
           #f.close()

@@ -27,22 +27,6 @@ class UDPServer(object):
     self.buffered_msgs = []
 
   def udp_send(self, msg):
-    # print self.cip, self.cport
-    # try:
-    #   msg = msg
-    # except TypeError:
-    #   try:
-    #     msg = msg.decode('hex')
-    #   except TypeError:
-    #     try:
-    #       msg = msg.decode('utf-8')
-    #     except UnicodeDecodeError:
-    #       try:
-    #         msg = msg.decode('latin-1')
-    #       except TypeError:
-    #         self.suspended = True
-    #         return
-
     self.socket.sendto(msg, (self.cip, self.cport))
 
   def udp_recv(self, size=2048):
@@ -88,7 +72,7 @@ class UDPServer(object):
       self.lock.acquire()
       if self.window>0:
           self.send_msg = str(self.seqNo)+'|*)'+self.send_msg
-          print "send %s" %self.seqNo
+          #print "send %s" %self.seqNo
           #print "msg***   %s" %self.send_msg
           self.buffered_msgs.append([self.seqNo,self.send_msg]) #store the msg in a dict for reTx
           self.udp_send(self.send_msg)
@@ -100,7 +84,7 @@ class UDPServer(object):
           self.window -=1
           #print "send release %s" %self.windo
       self.lock.release()
-    print "send EOF %d %s" %(self.suspended,prev_msg)
+    #print "send EOF %d %s" %(self.suspended,prev_msg)
     self.udp_send('EOF')
     self.buffered_msgs.append([self.seqNo,'EOF'])
     f.close()
@@ -109,16 +93,16 @@ class UDPServer(object):
       count = 0
       if self.buffered_msgs[0][0]>ack_no: #dup ack
         return -1
-      for i in self.buffered_msgs:
-        if i[0]== ack_no:
-          self.buffered_msgs.remove(i)
+      while self.buffered_msgs:
+        if self.buffered_msgs[0][0]== ack_no:
+          del self.buffered_msgs[0]
           self.window += 1
           return count
         else:
-          self.buffered_msgs.remove(i)
+          del self.buffered_msgs[0]
           self.window += 1
-        count +=1
-      return -1  
+          count +=1
+      return count
     
   def rec_ack(self,tries=10):
     while not self.suspended:
@@ -139,18 +123,18 @@ class UDPServer(object):
       if msg[1][:3]=='ACK':
         self.lock.acquire()
         
-        print "rec %s" %self.window
+        #print "rec %s" %self.window
         index = self.get_index(int(msg[0]))
         if index == -1:#dup msg
           self.suspended = True
-          print "duplicate ack %s" %msg[0]
+          #print "duplicate ack %s" %msg[0]
           self.udp_send("STA")
           while self.buffered_msgs:
              self.udp_send(self.buffered_msgs[0][1])
-             print "duplicate send %s" %self.buffered_msgs[0][0]
+             #print "duplicate send %s" %self.buffered_msgs[0][0]
              msg = self.udp_recv()
              msg = msg.split('|')
-             print "duplicate rec ack %s" %msg[0]
+             #print "duplicate rec ack %s" %msg[0]
              if msg[1][:3]=='ACK' and msg[0] == str(self.buffered_msgs[0][0]):
                self.buffered_msgs.pop(0)
                self.window+=1
@@ -159,7 +143,7 @@ class UDPServer(object):
         self.udp_send("END")
         self.suspended = False
         self.lock.release()
-        print "rec release %s" %self.window
+        #print "rec release %s" %self.window
   
     
   def transfer(self):
