@@ -12,7 +12,7 @@ class ChatRoom(object):
   Class object for holding chatroom specific info
   """
 
-  def __init__(self, server_reference, name, username):
+  def __init__(self, server_reference, name, username, password=None):
     """
     ChatRoom ID is auto generated from server's room count history.
     :param server_reference: Pointer to server object that instantiated this class
@@ -22,6 +22,13 @@ class ChatRoom(object):
     self.server = server_reference
     self.name = name
     self.clients = [username]
+    self.password = password
+
+  def get_password(self):
+    """
+    Return the password for this chatroom.
+    """
+    return self.password
 
   def remove_client(self, username):
     """
