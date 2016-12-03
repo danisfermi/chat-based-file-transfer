@@ -116,6 +116,7 @@ class Server(object):
       print 'Incoming connection from', addr
       if not self.suspended:
         thread.start_new_thread(client.execute, empty_tuple)
+    print 'Server is suspended. Thank you!'
 
 
 s1 = Server()

@@ -6,6 +6,7 @@ from chatRoom import *
 import logging
 import random
 MAX_SIZE = 16
+import os
 logging.basicConfig(filename='server.log', level=logging.DEBUG)
 
 
@@ -46,19 +47,28 @@ class UDPClient(object):
     # print msg
     return msg
 
+  def write_filename(self, filename):
+    if self.parent.check_file(filename):
+      return self.write_filename('1' + filename)
+    else:
+      return filename
+
   def execute(self):
     msg = self.udp_recv()
-    if msg[:5] == 'ERROR':  # File not found on peer
+    if msg[:5] == 'ERROR':  # Peer rejects connection or File not found on peer
+      print msg
       self.suspended = True
       return
     elif msg[:2] == 'OK':  # Save peer ip and port details, bind a port and send that
+      print msg
       msg = msg.split("|")
       self.sip = msg[2]
       self.sport = int(msg[3])
       print self.sip, self.sport
     else:
       return
-    f = open('folder/' + self.filename + '1', 'w')
+    new_name = self.write_filename(self.filename)
+    f = open('folder/' + new_name, 'w')
     self.seqNo =0
     self.count = 0
     neg_ack = 0
@@ -117,4 +127,5 @@ class UDPClient(object):
           #self.suspended = True
           #f.close()
         # print msg
-    # print 'finished'
+        #os.rename('folder/' + new_name, 'folder' + self.filename)
+        # print "Client all close"
