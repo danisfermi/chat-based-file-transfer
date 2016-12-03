@@ -1,7 +1,9 @@
 # Chat based Peer-to-peer File Transfer
 
 The following project was implemented in partial compliance to the course requirements of CSC 573 Internet Protocols course, taken in Fall 2016 at North Carloina State University under Prof. Muhammad Shahzad.
-The project is a Chat based peer-to-peer file transfer application, that uses socket programming in Python, to let clients connect to a caht room hosted on a central server. The clients (interchangeably refered to as peers for the duration of this application) may leverage the same chat interface to request for and receive files from other peers.
+
+
+Chat based peer-to-peer file transfer application. Lets clients create or connect to chat rooms hosted on a central server. The clients are interchangeably refered to as peers.  The application defines a template to send messages and the clients may leverage the same chat interface to request and recieve files from their peers.
 
 ## Features
 
