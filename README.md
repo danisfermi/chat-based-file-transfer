@@ -19,6 +19,12 @@ On the device we wish to execute the client, run client.py. Client.py takes as a
 --port: specify the server port number to connect to: 50000-50009 (by default)
 -w --window: select window size n for GO-BACK-N protocol
 
+After that, follow the onscreen prompts and execute as per required.
+
+eg: #Give window size inputs as 16 or 32 for efficient transfer.
+sudo ./server.py --Run the server code as admin
+sudo ./client.py -w 16 -p 100 --This will execute the client with window size 16 and the parallel connections 100
+
 c. How to interpret the results
 
 Test cases included inside the project report.
