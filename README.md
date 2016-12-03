@@ -62,13 +62,18 @@ Give an example
 
 ## Future Work
 
-
+This is a simple, albeit complete implementation of a chat based file transfer application. It has so much potential for enhancements and integration with additional features. Some of these features we expect to add in the near future include:-
+* NAT Traversal: The ability to detect servers who are connected behind NATs. Our current application requires every device to be in the same network. We can overcome this limitation by using NAT traversal (universal plug-and-play).
+* Multi-hop Multi Server: Ability to have 2 peering servers. This gives us access to support more clients. The servers should be able to communicate with each other, facilitating exchange of messages between devices connected across the servers.
 
 ## Authors
 
-* **Billie Thompson** - *Initial work* - [PurpleBooth](https://github.com/PurpleBooth)
+* **Arjun Augustine** - *Initial work* - [arjunaugustine](https://github.com/arjunaugustine)
+* **Eswar Kokkiligadda** - *Initial work* - [PurpleBooth](https://github.com/PurpleBooth)
+* **Danis Fermi** - *Initial work* - [danisfermi](https://github.com/danisfermi)
+* **Aparna Maleth** - *Initial work* - [PurpleBooth](https://github.com/PurpleBooth)
 
-See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
+See also the list of [contributors]() who participated in this project.
 
 ## License
 
