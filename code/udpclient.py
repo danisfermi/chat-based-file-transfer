@@ -95,6 +95,7 @@ class UDPClient(object):
            f.write(i)
         stop = time()
         f.close()
+        print stop, start
         print "Completed file transfer in " + str(stop - start) + " seconds."
       elif msg[:3] == 'END':
         neg_ack = 0
@@ -118,7 +119,7 @@ class UDPClient(object):
           continue
         elif msg[0]== str(self.seqNo):
           ack = msg[0]+'|'+'ACK'
-          if random.randint(1,1000)>500 or self.seqNo ==self.parent.N-1 or neg_ack:
+          if random.randint(1,800)>500 or self.seqNo ==self.parent.N-1 or neg_ack:
             self.udp_send(ack)
             #print " client ack %s" %msg[0]
             self.prev_ack = (self.seqNo+1)%self.parent.N -1
@@ -136,7 +137,9 @@ class UDPClient(object):
           self.seqNo %= self.parent.N
         else:
           self.udp_send(str(self.prev_ack)+'|ACK')
-          #print " client ack %d" %self.prev_ack
+          self.seqNo += self.prev_ack+1
+          self.seqNo %= self.parent.N
+          #print " err client ack %d" %self.prev_ack
           
           #self.suspended = True
           #f.close()

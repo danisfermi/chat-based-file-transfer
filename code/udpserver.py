@@ -61,8 +61,8 @@ class UDPServer(object):
     msg = str(msg.decode())
     if msg[-1:] == '\n':
       msg = msg[:-1]
-    if msg != 'ACK':
-      print msg
+    #if msg != 'ACK':
+      #print msg
     return msg
 
   def execute(self):

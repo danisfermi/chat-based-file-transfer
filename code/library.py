@@ -33,7 +33,6 @@ def client_recv(s):
   return message
 
 
-
 def send_data(s, data):
   """
   Send data to client via socket s

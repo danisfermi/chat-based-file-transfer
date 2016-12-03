@@ -27,8 +27,7 @@ class Client(object):
       self.file_share[filename] = True
     self.global_share = True
     self.max_share_count = 2
-    self.iplist = ['0.0.0.0', '192.168.0.100', '192.168.0.106', '192.168.0.103',
-                   '127.0.0.1', '10.139.63.161', '10.139.62.88', 'localhost']  # 2 server IP's to be added here
+    self.iplist = ['0.0.0.0', '127.0.0.1']  # 2 server IP's to be added here
     self.portlist = [i for i in xrange(start, start+tries-1)]
     self.max_conn_lock = threading.Lock()
     self.get_args()
@@ -106,7 +105,8 @@ class Client(object):
     :param filename: File name for which to set share enable/disable
     :param boolean: Boolean for enable/disable
     """
-    if not self.check_file(filename):
+    self.sync_file_folder()
+    if not filename not in list(self.file_share):
       print "File " + filename + " not found in folder"
     else:
       self.file_share[filename] = boolean
@@ -134,7 +134,6 @@ class Client(object):
     self.sync_file_folder()
     for file in os.listdir('folder'):
       share = self.file_share.get(file, None)
-      print file, ' ', share
       if fnmatch.fnmatch(file, filename):
         return share and self.global_share
     return False
@@ -169,7 +168,7 @@ class Client(object):
     elif instr == 'getsharestatus':
       self.get_share_status()
     elif instr == 'setwindowsize':
-      self.set_window_size(arg)
+      self.set_window_size(int(arg))
 
   def handle_exit_commands(self, msg):
     """
