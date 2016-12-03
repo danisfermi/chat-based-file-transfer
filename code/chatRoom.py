@@ -2,9 +2,6 @@
 
 from library import *
 from socket import *
-import logging
-
-logging.basicConfig(filename='server.log', level=logging.DEBUG)
 
 
 class ChatRoom(object):

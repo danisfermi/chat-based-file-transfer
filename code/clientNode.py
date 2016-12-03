@@ -3,9 +3,7 @@
 from library import *
 from socket import *
 from chatRoom import *
-import logging
 
-logging.basicConfig(filename='server.log', level=logging.DEBUG)
 
 
 class ClientNode(object):
@@ -58,7 +56,6 @@ class ClientNode(object):
     """
     Try tries number of times to get a unique username from client.
     """
-    logging.info('Check_username')
     msg = decode_data(recv_data(self.socket))
     name = msg[0]
     if name in list(self.server.clients) + ['server', 'all', 'root', 'me']:  # invalid usernames
@@ -78,7 +75,7 @@ class ClientNode(object):
     """
     Check if client wants to create a new chatroom or join an existing one.
     """
-    logging.info('create_or_join')
+    # logging.info('create_or_join')
     if self.suspended:
       return
     msg = decode_data(recv_data(self.socket))
@@ -111,7 +108,7 @@ class ClientNode(object):
     Create chatroom - Add client as first user of room when a unique name is received
     :param tries: Retry 'tries' number of times to get a unique chatroom name.
     """
-    logging.info('Create_chatroom')
+    # logging.info('Create_chatroom')
     if self.suspended:
       return
     msg = decode_data(recv_data(self.socket))
@@ -153,7 +150,7 @@ class ClientNode(object):
     Join chatroom - Add client to client list of room when request is received
     :param tries: Retry 'tries' number of times to get an existent chatroom name.
     """
-    logging.info('join_chatroom')
+    # logging.info('join_chatroom')
     if self.suspended:
       return
     msg = decode_data(recv_data(self.socket))

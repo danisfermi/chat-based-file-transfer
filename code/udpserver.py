@@ -3,10 +3,7 @@
 from library import *
 from socket import *
 from chatRoom import *
-import logging
 import threading
-
-logging.basicConfig(filename='server.log', level=logging.DEBUG)
 
 
 class UDPServer(object):

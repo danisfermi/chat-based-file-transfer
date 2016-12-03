@@ -4,12 +4,8 @@ from library import *
 from socket import *
 from chatRoom import *
 from time import time
-import logging
 import random
 import os
-
-
-logging.basicConfig(filename='server.log', level=logging.DEBUG)
 
 
 class UDPClient(object):

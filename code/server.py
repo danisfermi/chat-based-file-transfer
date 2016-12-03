@@ -4,9 +4,6 @@ from library import *
 from socket import *
 from chatRoom import *
 from clientNode import *
-import logging
-
-logging.basicConfig(filename='server.log', level=logging.DEBUG)
 
 
 class Server(object):
