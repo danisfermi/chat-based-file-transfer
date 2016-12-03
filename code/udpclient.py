@@ -3,11 +3,12 @@
 from library import *
 from socket import *
 from chatRoom import *
+from time import time
 import logging
 import random
 import os
 
-MAX_SIZE = 16
+
 logging.basicConfig(filename='server.log', level=logging.DEBUG)
 
 
@@ -84,6 +85,7 @@ class UDPClient(object):
     self.seqNo =0
     self.count = 0
     neg_ack = 0
+    start = time()
     while not self.suspended:
       msg = self.udp_recv()
       #self.udp_send('ACK')
@@ -91,13 +93,14 @@ class UDPClient(object):
         self.suspended = True
         for i in self.buffered_msgs:
            f.write(i)
+        stop = time()
         f.close()
-        print "Client all close"
+        print "Completed file transfer in " + str(stop - start) + " seconds."
       elif msg[:3] == 'END':
         neg_ack = 0
       else:
         msg = msg.split("|*)")
-        self.count = random.randint(1,100)
+        self.count = random.randint(1,self.parent.Err)
         #print "hshshsh client  msg seq no and expected seq no %s %s" %(msg[0],self.seqNo)
         
         if self.count==3 and not neg_ack:
@@ -111,14 +114,14 @@ class UDPClient(object):
             #print " ********client  msg seq no and expected seq no %s %s" %(msg[0],self.seqNo)
             msg = self.udp_recv()
           self.seqNo = self.prev_ack+1
-          self.seqNo %= MAX_SIZE
+          self.seqNo %= self.parent.N
           continue
         elif msg[0]== str(self.seqNo):
           ack = msg[0]+'|'+'ACK'
-          if random.randint(1,1000)>500 or self.seqNo ==MAX_SIZE-1 or neg_ack:
+          if random.randint(1,1000)>500 or self.seqNo ==self.parent.N-1 or neg_ack:
             self.udp_send(ack)
             #print " client ack %s" %msg[0]
-            self.prev_ack = (self.seqNo+1)%MAX_SIZE -1
+            self.prev_ack = (self.seqNo+1)%self.parent.N -1
             #write all the pending msgs
             for i in self.buffered_msgs:
               f.write(i)
@@ -130,7 +133,7 @@ class UDPClient(object):
           #print "msg %s" %msg[1]
           #print " client  msg seq no and expected seq no %s %s" %(msg[0],self.seqNo)
           self.seqNo += 1
-          self.seqNo %= MAX_SIZE
+          self.seqNo %= self.parent.N
         else:
           self.udp_send(str(self.prev_ack)+'|ACK')
           #print " client ack %d" %self.prev_ack

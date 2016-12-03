@@ -21,6 +21,7 @@ class Client(object):
     self.pport = bind_to_random(self.socket)
     self.ip = gethostbyname(gethostname())
     self.N = 16
+    self.Err = 100
     self.file_share = dict()
     for filename in os.listdir('folder'):
       self.file_share[filename] = True
@@ -47,7 +48,7 @@ class Client(object):
 
   def get_args(self):
     try:
-      opts, args = getopt.getopt(sys.argv[1:], "hs:p:w:", ["help", "share=", 'parallel=', 'ip=', 'port=', 'window='])
+      opts, args = getopt.getopt(sys.argv[1:], "hs:p:w:e:", ["help", "share=", 'parallel=', 'ip=', 'port=', 'window=','errprob'])
     except getopt.GetoptError as err:
       # print help information and exit:
       print str(err)  # will print something like "option -a not recognized"
@@ -59,11 +60,13 @@ class Client(object):
         self.usage()
         sys.exit()
       elif opt in ("-s", "--share"):
-        self.set_global_share(arg)
+        self.set_global_share(int(arg))
       elif opt in ("-p", "--parallel"):
-        self.max_share_count = arg
+        self.max_share_count = int(arg)
       elif opt in "--window":
         self.N = int(arg)
+      elif opt in "--errprob":
+        self.Err = int(arg)
       elif opt in "--ip":
         self.iplist.append(arg)
       elif opt in "--port":
@@ -144,21 +147,29 @@ class Client(object):
     print 'Global share status: ', self.global_share
     print 'File share status:'
     print self.file_share
+    
+  def set_window_size(self, N):
+    """
+    Set the window size used by Go Back N protocol to 'N'
+    """
+    self.N = N
 
-  def handle_user_commands(self, instr):
+  def handle_user_commands(self, instr, arg=None):
     """
     Check instr for user commands and call the required functions
     """
     if instr == 'setshare':
-      self.set_share(msg[2], True)
+      self.set_share(arg, True)
     elif instr == 'clrshare':
-      self.set_share(msg[2], False)
+      self.set_share(arg, False)
     elif instr == 'setglobalshare':
       self.set_global_share(True)
     elif instr == 'clrglobalshare':
       self.set_global_share(False)
     elif instr == 'getsharestatus':
       self.get_share_status()
+    elif instr == 'setwindowsize':
+      self.set_window_size(arg)
 
   def handle_exit_commands(self, msg):
     """
@@ -193,7 +204,7 @@ class Client(object):
           empty_tuple = ()
           thread.start_new_thread(udpserver.execute, empty_tuple)
         elif msg[0].lower() == '#me':
-          self.handle_user_commands(msg[1].lower())
+          self.handle_user_commands(msg[1].lower(), msg[2].lower())
 
   def listen_to_user(self):
     """

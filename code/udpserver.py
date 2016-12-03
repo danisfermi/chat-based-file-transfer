@@ -5,7 +5,7 @@ from socket import *
 from chatRoom import *
 import logging
 import threading
-MAX_SIZE = 16
+
 logging.basicConfig(filename='server.log', level=logging.DEBUG)
 
 
@@ -95,7 +95,7 @@ class UDPServer(object):
     :return:
     """
     buff = 2048
-    self.window = MAX_SIZE
+    self.window = self.parent.N
     self.seqNo = 0
     f = open('folder/' + self.filename)
     self.send_msg = f.read(buff-10) # 4 bytes for seq no
@@ -112,7 +112,7 @@ class UDPServer(object):
           prev_msg = self.send_msg
           self.send_msg = f.read(buff-10) # 4 bytes for seq no
           self.seqNo +=1  
-          self.seqNo %=MAX_SIZE
+          self.seqNo %=self.parent.N
           #print "send %s" %self.window
           self.window -=1
           #print "send release %s" %self.windo
@@ -128,19 +128,19 @@ class UDPServer(object):
     :param ack_no:
     :return:
     """
-      count = 0
-      if self.buffered_msgs[0][0]>ack_no: #dup ack
-        return -1
-      while self.buffered_msgs:
-        if self.buffered_msgs[0][0]== ack_no:
-          del self.buffered_msgs[0]
-          self.window += 1
-          return count
-        else:
-          del self.buffered_msgs[0]
-          self.window += 1
-          count +=1
-      return count
+    count = 0
+    if self.buffered_msgs[0][0]>ack_no: #dup ack
+      return -1
+    while self.buffered_msgs:
+      if self.buffered_msgs[0][0]== ack_no:
+        del self.buffered_msgs[0]
+        self.window += 1
+        return count
+      else:
+        del self.buffered_msgs[0]
+        self.window += 1
+        count +=1
+    return count
     
   def rec_ack(self,tries=10):
     """
