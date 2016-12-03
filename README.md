@@ -34,7 +34,7 @@ git clone git@github.com:arjunaugustine/chat-based-file-transfer.git
 
 ### How to use it
 
-Refer to [a relative link](code/README.md)
+Refer to [Code Readme](code/README.md)
 
 ## Running the tests
 
@@ -72,7 +72,7 @@ See also the list of [contributors](https://github.com/your/project/contributors
 
 ## License
 
-Public
+This project is licensed under the GPLV3 License - see the [LICENSE](LICENSE) file for details
 
 ## Acknowledgments
 
