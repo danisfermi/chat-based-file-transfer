@@ -15,6 +15,7 @@ Chat based peer-to-peer file transfer application. Lets clients create or connec
 * Clients can broadcast a request for a specific file via chat. All receiving clients who have the requested file will respond. The client can then choose from among them, to initiate a file transfer via UDP connection. We have tested a variety of file formats including pdf, txt, mp3, jpg etc. We also implement an ACK based reliablity control on top of the unreliable UDP connection.
 * Users have the freedom to choose whether to selectively disable/enable shareablity status of a file (or all files).
 * Go-back-N method of ARQ is implemented, with the user having the freedom to choose the window size. This enables us to test various timing parameter by varying the window size and testing for various file formats.
+* All operations take place in parallel. Each connection request from client to the server, file transfer from peer to peer request etc. spawns a new thread. Using this multi-threading, we can speed up the application significantly and achieve efficient real-time response.
 Detailed description on how to go about implementing these features is present in [README.md](code/README.md)
 
 ## Getting Started
@@ -90,7 +91,7 @@ This is a simple, albeit complete implementation of a chat based file transfer a
 * **Arjun Augustine** - *Initial work* - [arjunaugustine](https://github.com/arjunaugustine)
 * **Eswar Kokkiligadda** - *Initial work* - [PurpleBooth](https://github.com/PurpleBooth)
 * **Danis Fermi** - *Initial work* - [danisfermi](https://github.com/danisfermi)
-* **Aparna Maleth** - *Initial work* - [PurpleBooth](https://github.com/PurpleBooth)
+* **Aparna Maleth** - *Initial work* - [aparnamaleth](https://github.com/aparnamaleth)
 
 See also the list of [contributors]() who participated in this project.
 
