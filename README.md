@@ -8,13 +8,13 @@ Chat based peer-to-peer file transfer application. Lets clients create or connec
 ## Features
 
 * Peers (clients) can connect to a central server over a TCP connection. This enables them to create or join a chatroom.
-* Chatroom creator (first client who created the chatroom) can decide whether to enforce password based authentication for connectin to chatrooms.
-* Connected clients can chat with other peers present in the chatroom. He can send a broadcast message to all clients, or initiate a directed chat. He can also chat with the server.
+* Chatroom creator (first client who created the chatroom) can decide whether to enforce password based authentication for connecting to chatrooms (i.e make it a private chatroom where only clients who know the password can enter) or a public chat room (where anyone who knows the name of the cahtroom can connect).
+* Connected clients can chat with other peers present in the chatroom. He can send a broadcast message to all clients, or initiate a directed chat. He can also chat with the server (server can be regarded as the admin).
 * Server acts as a pseudo admin, monitoring all chat activities. Additionaly, the server has the power to kick misbehaving clients, regulate client messages, pull down existing chat rooms etc.
 * Clients can broadcast a request for a specific file via chat. All receiving clients who have the requested file will respond. The client can then choose from among them, to initiate a file transfer via UDP connection. We have tested a variety of file formats including pdf, txt, mp3, jpg etc. We also implement an ACK based reliablity control on top of the unreliable UDP connection.
 * Users have the freedom to choose whether to selectively disable/enable shareablity status of a file (or all files).
 * Go-back-N method of ARQ is implemented, with the user having the freedom to choose the window size. This enables us to test various timing parameter by varying the window size and testing for various file formats.
-Detailed description on how to go about implementing these features is present in [README](code/README.md)
+Detailed description on how to go about implementing these features is present in [README.md](code/README.md)
 
 ## Getting Started
 
