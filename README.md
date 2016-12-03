@@ -3,14 +3,15 @@
 The following project was implemented in partial compliance to the course requirements of CSC 573 Internet Protocols course, taken in Fall 2016 at North Carloina State University under Prof. Muhammad Shahzad.
 
 
-Chat based peer-to-peer file transfer application. Lets clients create or connect to chat rooms hosted on a central server. The clients are interchangeably refered to as peers.  The application defines a template to send messages and the clients may leverage the same chat interface to request and recieve files from their peers.
+Chat based peer-to-peer file transfer application. Lets clients create or connect to chat rooms hosted on a central server. The clients are interchangeably refered to as peers.  The application defines a template to send messages and the clients may leverage the same chat interface to request and recieve files from their peers. The client can utilize a set of pre-defined commands to implement various special features listed in the features section.
 
 ## Features
 
-* Peers (clients) can connect to a central server over a TCP connection. This enables them to create or join a chatroom.
-* Chatroom creator (first client who created the chatroom) can decide whether to enforce password based authentication for connecting to chatrooms (i.e make it a private chatroom where only clients who know the password can enter) or a public chat room (where anyone who knows the name of the cahtroom can connect).
-* Connected clients can chat with other peers present in the chatroom. He can send a broadcast message to all clients, or initiate a directed chat. He can also chat with the server (server can be regarded as the admin).
+* Peers (alternatively refered to as clients or users) can connect to a central server over a TCP connection. This enables them to create or join a chatroom.
+* Chatroom creator (first client who created the chatroom) can decide whether to enforce password based authentication while connecting to chatrooms (i.e make it a private chatroom where only clients who know the password can enter) or a public chat room (where anyone who knows the name of the cahtroom can connect).
+* Connected clients are prompted to enter a unique identifier (refered to as username), which becomes his identity for the duration of the server. Identified by this username, he can chat with other peers present in the chatroom. He can send a broadcast message to all clients, or initiate a directed chat. He can also chat with the server.
 * Server acts as a pseudo admin, monitoring all chat activities. Additionaly, the server has the power to kick misbehaving clients, regulate client messages, pull down existing chat rooms etc.
+* The server also notifies when peers join or leave a chatroom. In addition, at any point in time, the client can request the server to provide a real time updated list of all peers connected to that particular chatroom.
 * Clients can broadcast a request for a specific file via chat. All receiving clients who have the requested file will respond. The client can then choose from among them, to initiate a file transfer via UDP connection. We have tested a variety of file formats including pdf, txt, mp3, jpg etc. We also implement an ACK based reliablity control on top of the unreliable UDP connection.
 * Users have the freedom to choose whether to selectively disable/enable shareablity status of a file (or all files).
 * Go-back-N method of ARQ is implemented, with the user having the freedom to choose the window size. This enables us to test various timing parameter by varying the window size and testing for various file formats.
