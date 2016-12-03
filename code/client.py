@@ -20,6 +20,7 @@ class Client(object):
     self.suspended = False
     self.pport = bind_to_random(self.socket)
     self.ip = gethostbyname(gethostname())
+    self.N = 16
     self.file_share = dict()
     for filename in os.listdir('folder'):
       self.file_share[filename] = True
@@ -46,7 +47,7 @@ class Client(object):
 
   def get_args(self):
     try:
-      opts, args = getopt.getopt(sys.argv[1:], "hs:p:", ["help", "share=", 'parallel=', 'ip=', 'port='])
+      opts, args = getopt.getopt(sys.argv[1:], "hs:p:w:", ["help", "share=", 'parallel=', 'ip=', 'port=', 'window='])
     except getopt.GetoptError as err:
       # print help information and exit:
       print str(err)  # will print something like "option -a not recognized"
@@ -61,6 +62,8 @@ class Client(object):
         self.set_global_share(arg)
       elif opt in ("-p", "--parallel"):
         self.max_share_count = arg
+      elif opt in "--window":
+        self.N = int(arg)
       elif opt in "--ip":
         self.iplist.append(arg)
       elif opt in "--port":
@@ -80,6 +83,7 @@ class Client(object):
     print "-p  --parallel: Followed by integer to restrict number of parallel file shares. Not configurable in run-time"
     print "--ip: Specify the server IP address to connect to"
     print "--port: Specify the server port # to connect to. Default: 50000 to 50009"
+    print "-w  --window: Followed by integer select window size N for Go-Back-N protocol"
     return
 
   def set_global_share(self, boolean):

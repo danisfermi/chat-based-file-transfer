@@ -11,9 +11,15 @@ logging.basicConfig(filename='server.log', level=logging.DEBUG)
 
 class UDPServer(object):
   """
+  Class object for client that sends a file to a peer
   """
 
   def __init__(self, parent, msg):
+    """
+    Init method for udpserver object.
+    :param parent: Pointer to the client that invoked this thread
+    :param msg: Incoming message from client that requested for file
+    """
     udp_client_name = msg[0][1:]
     sock = socket(AF_INET, SOCK_DGRAM)
     filename, cip, cport = msg[2], msg[3], int(msg[4])
@@ -39,9 +45,17 @@ class UDPServer(object):
       self.parent.max_conn_lock.release()
 
   def udp_send(self, msg):
+    """
+    Send msg via the udp socket initialized in __init__ method.
+    """
     self.socket.sendto(msg, (self.cip, self.cport))
 
   def udp_recv(self, size=2048):
+    """
+    Receive msg from the udp socket initialized in __init__ method.
+    The incoming message is decoded and split to a list before bing returned.
+    :param size: Max receive size
+    """
     msg, saddr = self.socket.recvfrom(size)
     assert saddr[0] == self.cip
     msg = str(msg.decode())
@@ -76,6 +90,10 @@ class UDPServer(object):
     self.udp_send('OK| Sending file on port ' + str(self.cport) + ' from |' + str(self.sip) + '|' + str(self.sport))
 
   def send_file(self):
+    """
+
+    :return:
+    """
     buff = 2048
     self.window = MAX_SIZE
     self.seqNo = 0
@@ -105,6 +123,11 @@ class UDPServer(object):
     f.close()
     
   def get_index(self,ack_no):
+    """
+
+    :param ack_no:
+    :return:
+    """
       count = 0
       if self.buffered_msgs[0][0]>ack_no: #dup ack
         return -1
@@ -120,6 +143,11 @@ class UDPServer(object):
       return count
     
   def rec_ack(self,tries=10):
+    """
+
+    :param tries:
+    :return:
+    """
     while not self.suspended:
       #print "msg wait rec %s"
       msg = self.udp_recv()
@@ -158,9 +186,7 @@ class UDPServer(object):
         self.udp_send("END")
         self.suspended = False
         self.lock.release()
-        #print "rec release %s" %self.window
-  
-    
+
   def transfer(self):
     """
     Transfer the filename in our folder/filename to the server.
@@ -172,20 +198,6 @@ class UDPServer(object):
     thread.start_new_thread(self.send_file, empty_tuple)
     print "created a thread"
     thread.start_new_thread(self.rec_ack, empty_tuple)
-      
-    ##old code
-    #buff = 2048
-    #f = open('folder/' + self.filename)
-    #msg = f.read(buff)
-    #while msg != '' and not self.suspended:
-     # self.send_pkt(msg)
-      #msg = f.read(buff)
-    #self.send_pkt('EOF')
-    #f.close()
-    ##END of old code
-    # print "All close"
-
-
 
   def send_pkt(self, send_msg, tries=10):
     """

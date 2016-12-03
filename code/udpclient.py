@@ -5,16 +5,25 @@ from socket import *
 from chatRoom import *
 import logging
 import random
-MAX_SIZE = 16
 import os
+
+MAX_SIZE = 16
 logging.basicConfig(filename='server.log', level=logging.DEBUG)
 
 
 class UDPClient(object):
   """
+  Class object for client that receives a file from a peer
   """
 
   def __init__(self, parent, msg, s, cp):
+    """
+    Init method for udpserver object.
+    :param parent: Pointer to the client that invoked this thread
+    :param msg: Incoming message from client that requested for file
+    :param s: UDP socket to receive files from
+    :param cp: Client port that the socket is bound to
+    """
     self.parent = parent
     self.socket = s
     self.udp_clientname = msg[0][1:]
@@ -26,34 +35,37 @@ class UDPClient(object):
     self.prev_ack = -1
 
   def udp_send(self, msg):
+    """
+    Send msg via the udp socket initialized in __init__ method.
+    """
     self.socket.sendto(msg.encode(), (self.sip, self.sport))
 
   def udp_recv(self, size=2048):
+    """
+    Receive msg from the udp socket initialized in __init__ method.
+    The incoming message is decoded and split to a list before bing returned.
+    :param size: Max receive size
+    """
     msg, saddr = self.socket.recvfrom(size)
-    # try:
-    #   msg = msg
-    # except TypeError:
-    #   try:
-    #     msg = msg.encode('utf-8')
-    #   except UnicodeDecodeError:
-    #     try:
-    #       msg = msg.encode('latin-1')
-    #     except TypeError:
-    #       self.suspended = True
-    #       return
     msg = str(msg)
-    # if msg[-1:] == '\n':
-    #   msg = msg[:-1]
-    # print msg
     return msg
 
   def write_filename(self, filename):
+    """
+    Get filename to write to
+    :param filename: File name that was requested
+    :return: Modified filename to write to
+    """
     if self.parent.check_file(filename):
       return self.write_filename('1' + filename)
     else:
       return filename
 
   def execute(self):
+    """
+
+    :return:
+    """
     msg = self.udp_recv()
     if msg[:5] == 'ERROR':  # Peer rejects connection or File not found on peer
       print msg
@@ -120,7 +132,6 @@ class UDPClient(object):
           self.seqNo += 1
           self.seqNo %= MAX_SIZE
         else:
-          #print "GBN ERRORRRRRRRRRRRRR"
           self.udp_send(str(self.prev_ack)+'|ACK')
           #print " client ack %d" %self.prev_ack
           
