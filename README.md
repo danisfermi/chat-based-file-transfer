@@ -36,7 +36,7 @@ git clone git@github.com:arjunaugustine/chat-based-file-transfer.git
 
 ### How to use it
 
-Refer to [Code Readme](code/README.md)
+Refer to [README.md](code/README.md)
 
 ## Running the tests
 
@@ -66,7 +66,7 @@ Give an example
 
 This is a simple, albeit complete implementation of a chat based file transfer application. It has so much potential for enhancements and integration with additional features. Some of these features we expect to add in the near future include:-
 * NAT Traversal: The ability to detect servers who are connected behind NATs. Our current application requires every device to be in the same network. We can overcome this limitation by using NAT traversal (universal plug-and-play).
-* Multi-hop Multi Server: Ability to have 2 peering servers. This gives us access to support more clients. The servers should be able to communicate with each other, facilitating exchange of messages between devices connected across the servers.
+* Multi-hop Multi Server: Ability to have 2 peering servers (we had planned to implement this as per the [Project Proposal](Proposal.md)). This gives us access to support more clients. The servers should be able to communicate with each other, facilitating exchange of messages between devices connected across the servers.
 
 ## Authors
 
