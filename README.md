@@ -3,20 +3,24 @@
 The following project was implemented in partial compliance to the course requirements of CSC 573 Internet Protocols course, taken in Fall 2016 at North Carloina State University under Prof. Muhammad Shahzad.
 
 
-Chat based peer-to-peer file transfer application. Lets clients create or connect to chat rooms hosted on a central server. The clients are interchangeably refered to as peers.  The application defines a template to send messages and the clients may leverage the same chat interface to request and recieve files from their peers. The client can utilize a set of pre-defined commands to implement various special features listed in the features section.
+Chat based peer-to-peer file transfer application, lets users create or connect to chat rooms hosted on a central server. Users (interchangeably refered to as peers or clients), can send messages to other individual peers in the chatroom, or broadcast it to the entire chatroom, using a template defined by the application. The server parses messages and forwards them to the requested destination(s). Messages can also be sent to self or the server although this is typically to send a set of pre-defined commands to use various features. These pre-defined commands, among others, leverage the same chat interface to facilitate requesting and recieving files from their peers. All message passing happens using TCP via server, but file transfers happen directly from peer to peer via UDP protocol for better performance. The application implements Go-Back-N protocol for UDP communications for reliability.
 
 ## Features
 
-* Peers (alternatively refered to as clients or users) can connect to a central server over a TCP connection. This enables them to create or join a chatroom.
-* Chatroom creator (first client who created the chatroom) can decide whether to enforce password based authentication while connecting to chatrooms (i.e make it a private chatroom where only clients who know the password can enter) or a public chat room (where anyone who knows the name of the cahtroom can connect).
-* Connected clients are prompted to enter a unique identifier (refered to as username), which becomes his identity for the duration of the server. Identified by this username, he can chat with other peers present in the chatroom. He can send a broadcast message to all clients, or initiate a directed chat. He can also chat with the server.
-* Server acts as a pseudo admin, monitoring all chat activities. Additionaly, the server has the power to kick misbehaving clients, regulate client messages, pull down existing chat rooms etc.
-* The server also notifies when peers join or leave a chatroom. In addition, at any point in time, the client can request the server to provide a real time updated list of all peers connected to that particular chatroom.
-* Clients can broadcast a request for a specific file via chat. All receiving clients who have the requested file will respond. The client can then choose from among them, to initiate a file transfer via UDP connection. We have tested a variety of file formats including pdf, txt, mp3, jpg etc. We also implement an ACK based reliablity control on top of the unreliable UDP connection.
-* Users have the freedom to choose whether to selectively disable/enable shareablity status of a file (or all files).
-* Go-back-N method of ARQ is implemented, with the user having the freedom to choose the window size. This enables us to test various timing parameter by varying the window size and testing for various file formats.
-* All operations take place in parallel. Each connection request from client to the server, file transfer from peer to peer request etc. spawns a new thread. Using this multi-threading, we can speed up the application significantly and achieve efficient real-time response.
-Detailed description on how to go about implementing these features is present in [README.md](code/README.md)
+* Users can connect to a central server and create or join a chatroom.
+* A user who creates a chatroom can decide whether to keep it private and enforce password based authentication for access or make it public where other users can freely join.
+* A user needs to select a unique username while logging in. Incoming messages are directed at this username. 
+* After login, the user is presented with a list of usernames of peers who are active in the chatroom. The server also notifies when peers join or leave a chatroom. And in addition, the client can ask the server to provide a list of all active users in that chatroom. 
+* The user can use these usernames to send messages to peers. A message with '@all' in place of username becomes a broadcast message and '@server' in place of username gets directed to the server. '@me' messages get routed back to self.
+* The server replaces '@\<destination username>' field in the message with source username in format '#\<source username>'
+* The server can kick misbehaving clients, pull down existing chat rooms and send info messages to individual clients, or all users.
+* Users can disable or enable file sharing for all files altogether, or individual files, using '@me' messages followed by proper commands.
+* Clients can use an '@all' message with 'whohas' command to check which users have a particular file. a request for a specific file via chat. All receipients who have the requested file which is share-enabled will respond automatically.
+* The client can then choose from a list of responders, to initiate a file transfer using 'getfile' command directed at the selected responder. We have tested a variety of file formats including pdf, txt, mp3, jpg etc.
+* Go-back-N method of ARQ is implemented, with the user having the freedom to configure window sizes during run time. This enables us to test various timing parameter by varying the window size and testing for various file formats.
+* A user can restrict the number of parallel outgoing file transfers after which, further requests will be blocked.
+* All operations take place in parallel. No message passing or file sharing tasks block normal usage until they are over.
+Detailed description on how to go about utilizing these features is present in [README.md](code/README.md)
 
 ## Getting Started
 
