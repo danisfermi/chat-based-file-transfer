@@ -86,6 +86,14 @@ This is a simple, albeit complete implementation of a chat based file transfer a
 * NAT Traversal: The ability to detect servers who are connected behind NATs. Our current application requires every device to be in the same network. We can overcome this limitation by using NAT traversal (universal plug-and-play).
 * Multi-hop Multi Server: Ability to have 2 peering servers (we had planned to implement this as per the [Project Proposal](Proposal.md)). This gives us access to support more clients. The servers should be able to communicate with each other, facilitating exchange of messages between devices connected across the servers.
 
+## Contributing
+
+1. Fork it!
+2. Create your feature branch: git checkout -b my-new-feature
+3. Commit your changes: git commit -am 'Add some feature'
+4. Push to the branch: git push origin my-new-feature
+5. Submit a pull request :D
+
 ## Authors
 
 * **Arjun Augustine** - *Initial work* - [arjunaugustine](https://github.com/arjunaugustine)
