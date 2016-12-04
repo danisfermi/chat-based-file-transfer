@@ -10,11 +10,14 @@ Navigate inside cde directory. This is our working directory, where all the run-
 
 ## b. Understanding how the code works:
 
-Following is a flow chart that depicts working of a server.
-![alt tag](../bin/Algorithm%20for%20Server-to-Client.png)
+Here is a block diagram showing how clients connect to a specific chatroom on a server in the application:
+<center>![alt tag](../bin/Block%20Diagram%20General.png)<\center>
 
-Following is a flow chart that depicts file transfer between two peers.
-![alt tag](../bin/Peer%20to%20peer%20File%20Transfer%20Algorithm.png)
+Following is a flow chart that depicts working of a server:
+<center>![alt tag](../bin/Algorithm%20for%20Server-to-Client.png)<\center>
+
+Following is a flow chart that depicts file transfer between two peers:
+<center>![alt tag](../bin/Peer%20to%20peer%20File%20Transfer%20Algorithm.png)<\center>
 
 ## c. How to run the code
 
@@ -81,9 +84,9 @@ Commands made available to the server:-
 
 ## d. How to interpret the results
 
-Chat         : Check for chat messages in terminal (Format: #sender|message from user)
-File Transfer: Check for file existance inside [folder](code/folder) or Check for terminal output
-Go-Back-N    : Results included in [README.md](README.md)
+1. Chat         : Check for chat messages in terminal (Format: #sender|message from user)
+1. File Transfer: Check for file existance inside [folder](code/folder) or Check for terminal output
+1. Go-Back-N    : Results included in [README.md](README.md)
 
 
 ## e. Any sample input and output files
