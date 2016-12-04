@@ -25,7 +25,7 @@ Figure shows how clients connect to server in the application
 * A user can restrict the number of parallel outgoing file transfers, after which, further requests will be blocked.
 * All operations happen in parallel. No message passing or file sharing tasks block normal use of other features.
 * Go-back-N protocol is implemented, with the user having the freedom to configure window sizes during run time. This enables us to test various timing parameter by varying the window size and testing for various file formats.
-Detailed description on how to go about utilizing these features is present in [README.md](code/README.md)
+Detailed description on how to go about utilizing these features is present in [code/README.md](code/README.md)
 
 ## Getting Started
 
@@ -54,7 +54,7 @@ git clone git@github.com:arjunaugustine/chat-based-file-transfer.git
 
 ### How to use it
 
-Refer to [README.md](code/README.md)
+Refer to [code/README.md](code/README.md)
 
 
 ## Results
