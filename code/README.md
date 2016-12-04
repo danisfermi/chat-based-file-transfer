@@ -37,6 +37,8 @@ Navigate inside the code directory and run server.py as admin(sudo because we ne
 ```
 sudo ./server.py
 ```
+The console will display the port number on which the server is listening. They will range from 5000 to 50009 by default.
+
 Next, on the device we need to start the client, run the client can be run with command line arguments. The options made available to us are:-
 
 | Argument       | Description                                     |
@@ -52,6 +54,11 @@ Example to start client:-
 ```
 sudo ./client.py -h
 ```
+By default, the client looks for server at IP addresses '0.0.0.0', and '127.0.0.1', at ports in range(50000, 50009). To connect to a server on a different IP or port number, use the --port and --ip command line arguments to let the client know where the server is. For example:
+```
+sudo ./client.py --ip=192.168.0.100 --port=50505
+```
+
 Displays the options aavailable to start client.
 ```
 sudo ./client.py -w 32 -p 100
