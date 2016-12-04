@@ -49,7 +49,7 @@ Refer to [README.md](code/README.md)
 
 ## Running the tests
 
-Link to code/README.md
+Refer to [README.md](code/README.md)
 
 ### Break down into end to end tests
 
@@ -89,7 +89,7 @@ This is a simple, albeit complete implementation of a chat based file transfer a
 ## Authors
 
 * **Arjun Augustine** - *Initial work* - [arjunaugustine](https://github.com/arjunaugustine)
-* **Eswar Kokkiligadda** - *Initial work* - [PurpleBooth](https://github.com/PurpleBooth)
+* **Eswar Kokkiligadda** - *Initial work* - [PurpleBooth]()
 * **Danis Fermi** - *Initial work* - [danisfermi](https://github.com/danisfermi)
 * **Aparna Maleth** - *Initial work* - [aparnamaleth](https://github.com/aparnamaleth)
 
