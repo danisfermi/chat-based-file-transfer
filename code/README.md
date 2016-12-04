@@ -45,17 +45,17 @@ Starts client with Go-Back-N window size 32 and 100 parallel connection limit
 
 Chat commands made available to the user:-
 
-| Command            | Description                                                      |
-|:------------------:|:----------------------------------------------------------------:|
-| @username|chat     | Sends a message 'chat' to 'username'                             |
-| @all|chat          | Sends a message 'chat' to all users in chatroom                  |
-| @server|chat       | Sends a message 'chat' to server (admin)                         |
-| @all|whohas|file   | Sends broadcast message to see who has file with filename 'file' |
-| @user|getfile|file | Sends a message to 'user' to start UDP peer-to-peer file transfer|
-| @server|setwindow|n| Sets Go-Back-N window size to 'n'                                |
-| @server|get_rooms  | Get a list of chat rooms avaialable                              |
-| @server|get_peers  | Get a list of connected peers                                    |
-| exit               | Clean exit chat room                                             |
+| Command              | Description                                                      |
+|:--------------------:|:----------------------------------------------------------------:|
+| `@username|chat`     | Sends a message 'chat' to 'username'                             |
+| `@all|chat`          | Sends a message 'chat' to all users in chatroom                  |
+| `@server|chat`       | Sends a message 'chat' to server (admin)                         |
+| `@all|whohas|file`   | Sends broadcast message to see who has file with filename 'file' |
+| `@user|getfile|file` | Sends a message to 'user' to start UDP peer-to-peer file transfer|
+| `@server|setwindow|n`| Sets Go-Back-N window size to 'n'                                |
+| `@server|get_rooms`  | Get a list of chat rooms avaialable                              |
+| `@server|get_peers`  | Get a list of connected peers                                    |
+| `exit`               | Clean exit chat room                                             |
 
 
 ## c. How to interpret the results
