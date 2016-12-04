@@ -6,7 +6,7 @@ Clone the library from git as follows:-
 ```
 git clone git@github.com:arjunaugustine/chat-based-file-transfer.git
 ```
-Navigate inside cde directory. This is our working directory, where all the run-time code is stored.
+Navigate inside code directory. This is our working directory, where all the run-time code is stored.
 
 ## b. Understanding how the code works:
 
@@ -51,19 +51,24 @@ Next, on the device we need to start the client, run the client can be run with 
 | -w --window    | Window Size for Go-Back-N (16/32 recommended)   |
 
 Example to start client:-
+
+To display the help/usage message that lists all acceptable command line arguments to client.py:
 ```
 sudo ./client.py -h
 ```
+
+
 By default, the client looks for server at IP addresses '0.0.0.0', and '127.0.0.1', at ports in range(50000, 50009). To connect to a server on a different IP or port number, use the --port and --ip command line arguments to let the client know where the server is. For example:
 ```
 sudo ./client.py --ip=192.168.0.100 --port=50505
 ```
 
-Displays the options aavailable to start client.
+
+To start a client with Go-Back-N window size 32 and a limit of 10 parallel file transfer connections:
 ```
-sudo ./client.py -w 32 -p 100
+sudo ./client.py -w 32 -p 10
 ```
-Starts client with Go-Back-N window size 32 and 100 parallel connection limit
+
 
 ### Chat Options
 
