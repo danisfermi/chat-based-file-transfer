@@ -23,7 +23,7 @@ We propose a chat room based communication and file transfer system. There are s
 
 Here is a figure showing how clients connect to a specific chatroom on a server in the application:
 <p align="center">
-  <img src="bin/Fig%201%20System%20Functionality.png?raw=true" alt="Sublime's custom image" width=600/>
+  <img src="bin/Fig%201%20System%20Functionality.png?raw=true" alt="Sublime's custom image"/>
 </p>
 
 ##Project Objectives
