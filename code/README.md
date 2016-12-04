@@ -11,13 +11,19 @@ Navigate inside cde directory. This is our working directory, where all the run-
 ## b. Understanding how the code works:
 
 Here is a block diagram showing how clients connect to a specific chatroom on a server in the application:
-<center>![alt tag](../bin/Block%20Diagram%20General.png)<\center>
+<p align="center">
+  <img src="../bin/Block%20Diagram%20General.png?raw=true" alt="Sublime's custom image"/>
+</p>
 
 Following is a flow chart that depicts working of a server:
-<center>![alt tag](../bin/Algorithm%20for%20Server-to-Client.png)<\center>
+<p align="center">
+  <img src="../bin/Algorithm%20for%20Server-to-Client.png?raw=true" alt="Sublime's custom image"/>
+</p>
 
 Following is a flow chart that depicts file transfer between two peers:
-<center>![alt tag](../bin/Peer%20to%20peer%20File%20Transfer%20Algorithm.png)<\center>
+<p align="center">
+  <img src="../bin/Peer%20to%20peer%20File%20Transfer%20Algorithm.png?raw=true" alt="Sublime's custom image"/>
+</p>
 
 ## c. How to run the code
 
