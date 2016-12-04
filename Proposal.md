@@ -21,6 +21,11 @@ There are implementations of chat rooms where peers who know each other come tog
 
 We propose a chat room based communication and file transfer system. There are several servers, that gives the peer the capability to connect to the closest server, and communicate with peer connected to the same server or to other servers using multi-hopping. Additionally, peers mention a chat room ID while connecting, making it visible only to others peers in the same chat room. We propose a small set of commands which the peers can use to mutually communicate and request for files. We plan to use UDP to transfer files, so that the latency for multi hop communication and unnecessary handshake traffic is avoided. The application is responsible for handling reliability and performance by implementing the Selective Repeat or the Go-Back-N algorithms.
 
+Here is a figure showing how clients connect to a specific chatroom on a server in the application:
+<p align="center">
+  <img src="bin/Fig%201%20System%20Functionality.png?raw=true" alt="Sublime's custom image" width=600/>
+</p>
+
 ##Project Objectives
 
   * Server informs every other peer, of any peer that joins/leaves a chat room.
