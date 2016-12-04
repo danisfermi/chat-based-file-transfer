@@ -6,6 +6,7 @@ The following project was implemented in partial compliance to the course requir
 Chat based peer-to-peer file transfer application, lets users create or connect to chat rooms hosted on a central server. Users (interchangeably refered to as peers or clients), can send messages to other individual peers in the chatroom, or broadcast it to the entire chatroom, using templates defined by the application. The server parses messages and forwards them to the requested destination(s). Messages can also be sent to self or the server although this is typically to send a set of pre-defined commands to use various features. These pre-defined commands, among others, leverage the same chat interface to facilitate requesting and recieving files from their peers. All message passing happens using TCP via server, but file transfers happen directly from peer to peer via UDP protocol for better performance. The application implements Go-Back-N protocol for UDP communications for reliability.
 
 ![alt tag](https://github.com/arjunaugustine/chat-based-file-transfer/blob/master/bin/Fig%201%20System%20Functionality.png)
+
 Figure shows how clients connect to server in the application
 
 ## Features
