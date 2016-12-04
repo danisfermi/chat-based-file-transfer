@@ -13,12 +13,12 @@ Chat based peer-to-peer file transfer application, lets users create or connect 
 * After login, the user is presented with a list of usernames of active peers in the chatroom. The server also notifies when peers join or leave a chatroom. And in addition, the user can ask the server to provide a list of all active users in that chatroom. 
 * Message fields are delimited using an '|' symbol. A message from 'bob' in the format '@alice|Hello!' gets directed to alice. The server replaces '@\<destination username>' field in the message with source username in format '#\<source username>'. Alice gets the message as '#bob|Hello'. Bob gets an error message from server if Alice was not found in the chatroom.
 * A message with '@all' in place of username becomes a broadcast message and '@server' in place of username gets directed to the server. '@me' messages get routed back to self.
-* The server can kick misbehaving clients, pull down chat rooms, or send info messages to individual clients, or to all users.
+* The server can kill misbehaving clients, pull down chat rooms, or send info messages to individual or all clients.
 * Users can disable or enable file sharing for all files altogether, or individual files, either using command line arguments, or at run-time, using '@me' messages followed by proper commands.
 * Clients can use an '@all' message with 'whohas' command to check which users have a particular file. All receipients who have the requested file which is share-enabled will respond automatically.
 * The client can then choose from a list of responders, to initiate a file transfer using 'getfile' command directed at the selected responder. We have tested a variety of file formats including pdf, txt, mp3, jpg etc.
 * A user can restrict the number of parallel outgoing file transfers, after which, further requests will be blocked.
-* All operations take place in parallel. No message passing or file sharing tasks block normal usage until they are over.
+* All operations happen in parallel. No message passing or file sharing tasks block normal use of other features.
 * Go-back-N protocol is implemented, with the user having the freedom to configure window sizes during run time. This enables us to test various timing parameter by varying the window size and testing for various file formats.
 Detailed description on how to go about utilizing these features is present in [README.md](code/README.md)
 
