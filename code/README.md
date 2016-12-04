@@ -25,6 +25,9 @@ Following is a flow chart that depicts file transfer between two peers:
   <img src="../bin/Peer%20to%20peer%20File%20Transfer%20Algorithm.png?raw=true" alt="Sublime's custom image" width=600/>
 </p>
 
+For a detailed list of all classes, functions and their descriptions, please see [ALGORITHM.md](ALGORITHM.md)
+
+
 ## c. How to run the code
 
 ### Start
