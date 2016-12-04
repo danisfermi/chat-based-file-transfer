@@ -75,6 +75,7 @@ We run server on the server PC using the terminal as sudo ./server.py.
 Then in the clients, we run the client code as sudo ./client.py -w 16 -p 100.
 The clients connect to the server. They enter their usernames and choose to connect to the chat room named chatroom chatroom.
 Once inside, we send some messages and request a file. We verify that the file has been successfully transferred to our folder.
+
 | Window Size   | File Size     | Throughput  |
 |:-------------:|:-------------:|:-----------:|
 | 16            | 21.76MB       | 1.046MBps   |
