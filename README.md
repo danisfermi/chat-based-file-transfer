@@ -1,4 +1,4 @@
-# Chat based Peer-to-peer File Transfer
+# Chat based peer-to-peer file transfer
 
 The following project was implemented in partial compliance to the course requirements of CSC 573 Internet Protocols course, taken in Fall 2016 at North Carloina State University under Prof. Muhammad Shahzad.
 
