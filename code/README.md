@@ -92,7 +92,7 @@ Chat commands made available to the user:-
 | `@me|clrshare|file`        | Disable sharing of filename: 'file'                              |
 | `@me|setglobalshare`       | Enable sharing all files                                         |
 | `@me|clrglobalshare`       | Disable sharing any files                                        |
-
+| `@me|getsharestatus`       | Get global share status, as well as individual file share status |
 
 Commands made available to the server:-
 
