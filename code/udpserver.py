@@ -54,7 +54,7 @@ class UDPServer(object):
     :param size: Max receive size
     """
     msg, saddr = self.socket.recvfrom(size)
-    assert saddr[0] == self.cip
+#     assert saddr[0] == self.cip  # Commenting this out. Doesnt work always. There are other strings coming in saddr.
     msg = str(msg.decode())
     if msg[-1:] == '\n':
       msg = msg[:-1]
