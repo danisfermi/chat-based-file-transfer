@@ -44,14 +44,14 @@ The console will display the port number on which the server is listening. They 
 
 Next, on the device we need to start the client, run the client can be run with command line arguments. The options made available to us are:-
 
-| Argument       | Description                                     |
-|:---------------|:------------------------------------------------|
-| -h --help      | Print help options                              |
-| -s --share     | 0/1 to clear/set global file share              |
-| -p --parallel  | Integer argument to define parallel connections |
-| --ip           | Server IP                                       |
-| --port         | Server Port (50000-50009 by default)            |
-| -w --window    | Window Size for Go-Back-N (16/32 recommended)   |
+| Argument       | Description                                              |
+|:---------------|:---------------------------------------------------------|
+| -h --help      | Print help options                                       |
+| -s --share     | 0/1 to clear/set global file share (default 1)           |
+| -p --parallel  | Int argument to define parallel connections (default 2)  |
+| --ip           | Server IP (tries 0.0.0.0, 127.0.0.1 by default)          |
+| --port         | Server Port (50000-50009 by default)                     |
+| -w --window    | Window Size for Go-Back-N (default is 16)                |
 
 Example to start client:-
 
@@ -86,7 +86,7 @@ Chat commands made available to the user:-
 | `@user|getfile|file`       | Sends a message to 'user' to start UDP peer-to-peer file transfer|
 | `@server|get_rooms`        | Get a list of chat rooms avaialable with server                  |
 | `@server|get_peers`        | Get a list of connected peers in chatroom                        |
-| `exit`                     | Clean exit chat room                                             |
+| `@server|exit`             | Clean exit chat room                                             |
 | `@me|setwindowsize|n`      | Sets Go-Back-N window size to 'n'                                |
 | `@me|setshare|file`        | Enable sharing of filename: 'file'                               |
 | `@me|clrshare|file`        | Disable sharing of filename: 'file'                              |
