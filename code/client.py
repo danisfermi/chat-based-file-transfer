@@ -66,7 +66,7 @@ class Client(object):
       elif opt in "--errprob":
         self.Err = int(arg)
       elif opt in "--ip":
-        self.iplist.append(arg)
+        self.iplist = [arg] + self.iplist
       elif opt in "--port":
         self.portlist.append(int(arg))
       else:
