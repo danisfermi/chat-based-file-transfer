@@ -90,8 +90,8 @@ Chat commands made available to the user:-
 | `@me|setwindowsize|n`      | Sets Go-Back-N window size to 'n'                                |
 | `@me|setshare|file`        | Enable sharing of filename: 'file'                               |
 | `@me|clrshare|file`        | Disable sharing of filename: 'file'                              |
-| `@me|setglobalshare|file`  | Enable sharing all files                                         |
-| `@me|clrglobalshare|file`  | Disable sharing any files                                        |
+| `@me|setglobalshare`       | Enable sharing all files                                         |
+| `@me|clrglobalshare`       | Disable sharing any files                                        |
 
 
 Commands made available to the server:-
