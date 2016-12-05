@@ -224,7 +224,7 @@ class ClientNode(object):
         else:  # Just deliver the message to server console
           print '|'.join(msg)
     else:
-      dest_client = self.chatroom.get_client(destination)
+      dest_client = self.chatroom.get_client(destination) if destination != 'me' else self
       if dest_client is None:
         send_err(self.socket, 'Sorry, destination client not present in chatroom\n')
       else:
