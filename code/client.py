@@ -37,7 +37,6 @@ class Client(object):
     for ip in self.iplist:
       for port in self.portlist:
         try:
-          print ip, port
           self.socket.connect((ip, port))
           return
         except error:
