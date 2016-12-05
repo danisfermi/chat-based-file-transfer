@@ -203,7 +203,8 @@ class Client(object):
           empty_tuple = ()
           thread.start_new_thread(udpserver.execute, empty_tuple)
         elif msg[0].lower() == '#me':
-          self.handle_user_commands(msg[1].lower(), msg[2].lower())
+          arg = None if len(msg) < 3 else msg[2].lower()
+          self.handle_user_commands(msg[1].lower(), arg)
 
   def listen_to_user(self):
     """
